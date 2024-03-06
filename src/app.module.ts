@@ -4,6 +4,9 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -23,7 +26,10 @@ import { join } from 'path';
       ssl: true,
       entities: [join(__dirname, '**', '*.entity.{ts,js}')],
       synchronize: true,
+      namingStrategy: new SnakeNamingStrategy(),
     }),
+    AuthModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],

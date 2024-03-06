@@ -22,7 +22,7 @@ export enum AccountStatus {
 }
 
 @Entity({ name: 'user' })
-export class UserEntity {
+export class User {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -46,11 +46,11 @@ export class UserEntity {
   @IsEmail()
   email: string;
 
-  @Column()
-  first_name: string;
+  @Column({ nullable: true })
+  first_name?: string;
 
-  @Column()
-  last_name: string;
+  @Column({ nullable: true })
+  last_name?: string;
 
   @Column({
     type: 'enum',
