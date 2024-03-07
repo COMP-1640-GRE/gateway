@@ -7,7 +7,7 @@ import { nanoid } from 'nanoid';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class UserService {
+export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -39,5 +39,13 @@ export class UserService {
     user.password = hashedPassword;
 
     return this.usersRepository.save({ ...user, secret });
+  }
+
+  async findById(id: number): Promise<User> {
+    return this.usersRepository.findOneBy({ id });
+  }
+
+  async findByUsername(username: string): Promise<User> {
+    return this.usersRepository.findOneBy({ username });
   }
 }
