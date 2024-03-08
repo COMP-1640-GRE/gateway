@@ -31,11 +31,11 @@ export class User {
   username: string;
 
   @Column()
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @Column()
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   secret: string;
 
   @Column({

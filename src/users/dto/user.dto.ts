@@ -1,9 +1,12 @@
 import { IsEnum, IsString, IsStrongPassword, MaxLength } from 'class-validator';
-import { UserRole } from '../entities/user.entity';
+import { User, UserRole } from '../entities/user.entity';
+import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
-export class CreateUserDto {
+export class UserDto {
   @IsString()
   @MaxLength(64)
+  @ApiProperty({ example: 'student' })
   username: string;
 
   @IsString()
@@ -15,8 +18,28 @@ export class CreateUserDto {
     minLowercase: 1,
   })
   @MaxLength(64)
+  @ApiProperty({ example: 'superSecure@123' })
   password: string;
+}
 
+export class CreateUsersDto {
+  @ApiProperty({
+    isArray: true,
+    type: UserDto,
+  })
+  users: UserDto[];
+
+  @ApiProperty({ example: 'student' })
   @IsEnum(UserRole)
   role: UserRole;
+}
+
+export class CreateUsersResponseDto {
+  @ApiResponseProperty()
+  @Type(() => User)
+  data: User[];
+
+  constructor(partial: Partial<CreateUsersResponseDto>) {
+    Object.assign(this, partial);
+  }
 }
