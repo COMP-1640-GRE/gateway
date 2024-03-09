@@ -11,7 +11,11 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/roles.decorator';
 import { ListRequestDto } from 'src/utils/list.dto';
-import { CreateUsersDto, UpdateAccountDto } from './dto/user.dto';
+import {
+  AdminUpdateUserDto,
+  CreateUsersDto,
+  UpdateUserDto,
+} from './dto/user.dto';
 import { UserRole } from './entities/user.entity';
 import { UsersService } from './users.service';
 import {
@@ -37,7 +41,7 @@ export class UsersController {
   }
 
   @Patch()
-  update(@Body() dto: UpdateAccountDto, @JwtPayload() { id }: JwtPayloadType) {
+  update(@Body() dto: UpdateUserDto, @JwtPayload() { id }: JwtPayloadType) {
     return this.userService.update({ id, ...dto });
   }
 
@@ -51,5 +55,11 @@ export class UsersController {
   @Roles(UserRole.ADMINISTRATOR)
   remove(@Param('id') userId: string, @JwtPayload() { id }: JwtPayloadType) {
     return this.userService.remove(+id, +userId);
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.ADMINISTRATOR)
+  adminUpdate(@Param('id') userId: string, @Body() dto: AdminUpdateUserDto) {
+    return this.userService.adminUpdate(+userId, dto);
   }
 }

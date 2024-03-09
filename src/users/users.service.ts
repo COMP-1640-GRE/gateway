@@ -2,17 +2,18 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { nanoid } from 'nanoid';
+import { Faculty } from 'src/faculties/entities/faculty.entity';
+import { FacultiesService } from 'src/faculties/faculties.service';
 import { parseFilter } from 'src/utils/filter-parser';
 import { ListRequestDto, ListResponseDto } from 'src/utils/list.dto';
 import { parseSort } from 'src/utils/sort-parser';
 import { Repository } from 'typeorm';
 import {
+  AdminUpdateUserDto,
   CreateUsersDto,
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
 import { USER_ENTITY, User, UserRole } from './entities/user.entity';
-import { FacultiesService } from 'src/faculties/faculties.service';
-import { Faculty } from 'src/faculties/entities/faculty.entity';
 
 @Injectable()
 export class UsersService {
@@ -59,7 +60,6 @@ export class UsersService {
     // get the faculty
     if (faculty_id) {
       faculty = await this.facultiesService.findById(faculty_id);
-      console.log(faculty);
 
       if (!faculty) {
         throw new BadRequestException(
@@ -157,5 +157,48 @@ export class UsersService {
       throw new BadRequestException('You cannot delete yourself');
     }
     return this.usersRepository.delete(id);
+  }
+
+  async adminUpdate(id: number, dto: AdminUpdateUserDto) {
+    const { role, faculty_id, username, email } = dto;
+    // Check if any user already exists with Promise.race
+    if (username) {
+      const user = await this.findByUsername(username);
+
+      if (user) {
+        throw new BadRequestException(`User "${username}" already exists`);
+      }
+    }
+
+    if (email) {
+      const user = await this.findByEmail(email);
+
+      if (user) {
+        throw new BadRequestException(`Email "${email}" already exists`);
+      }
+    }
+
+    let faculty: Faculty;
+
+    // get the faculty
+    if (faculty_id) {
+      faculty = await this.facultiesService.findById(faculty_id);
+
+      if (!faculty) {
+        throw new BadRequestException(
+          `Faculty with id ${faculty_id} not found`,
+        );
+      }
+      if (
+        role === UserRole.ADMINISTRATOR ||
+        role === UserRole.UNIVERSITY_MARKETING_MANAGER
+      ) {
+        throw new BadRequestException(
+          `User with role ${role} cannot be assigned to a faculty`,
+        );
+      }
+    }
+    delete dto.faculty_id;
+    return this.usersRepository.update(id, { ...dto, faculty });
   }
 }

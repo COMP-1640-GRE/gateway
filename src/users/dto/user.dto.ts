@@ -1,8 +1,10 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  IsAlphanumeric,
   IsEmail,
   IsEnum,
+  IsLowercase,
   IsOptional,
   IsPositive,
   IsString,
@@ -14,9 +16,11 @@ import { User, UserRole } from '../entities/user.entity';
 
 export class UserDto {
   @IsString()
-  @MaxLength(64)
   @MinLength(4)
-  @ApiProperty({ example: 'student' })
+  @MaxLength(64)
+  @IsLowercase()
+  @IsAlphanumeric()
+  @ApiProperty({ example: 'john' })
   username: string;
 
   @IsString()
@@ -62,7 +66,7 @@ export class CreateUsersResponseDto {
   }
 }
 
-export class UpdateAccountDto {
+export class UpdateUserDto {
   @IsEmail()
   @IsOptional()
   @MinLength(1)
@@ -83,4 +87,28 @@ export class UpdateAccountDto {
   @MaxLength(100)
   @ApiProperty({ example: 'Doe', required: false })
   last_name: string;
+}
+
+export class AdminUpdateUserDto extends UpdateUserDto {
+  @IsString()
+  @IsOptional()
+  @MinLength(4)
+  @MaxLength(64)
+  @IsLowercase()
+  @IsAlphanumeric()
+  @ApiProperty({ example: 'john', required: false })
+  username: string;
+
+  @ApiProperty({ example: 'student' })
+  @IsEnum(UserRole)
+  @IsOptional()
+  role: UserRole;
+
+  @ApiProperty({
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsPositive()
+  faculty_id?: number;
 }
