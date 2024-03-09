@@ -108,7 +108,21 @@ export class UsersService {
     return this.usersRepository.findOneBy({ username });
   }
 
+  async findByEmail(email: string): Promise<User> {
+    return this.usersRepository.findOneBy({ email });
+  }
+
   async update(user: Partial<User>): Promise<User> {
+    delete user.username;
+
+    // check if email is unique
+    const foundUser = await this.findByEmail(user.email);
+    if (foundUser && foundUser.id !== user.id) {
+      throw new BadRequestException(
+        `User with email ${user.email} already exists`,
+      );
+    }
+
     return this.usersRepository.save(user);
   }
 }

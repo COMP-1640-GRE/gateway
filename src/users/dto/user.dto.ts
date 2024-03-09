@@ -1,6 +1,13 @@
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsString, IsStrongPassword, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  IsString,
+  IsStrongPassword,
+  MaxLength,
+} from 'class-validator';
 import { User, UserRole } from '../entities/user.entity';
 
 export class UserDto {
@@ -42,4 +49,24 @@ export class CreateUsersResponseDto {
   constructor(partial: Partial<CreateUsersResponseDto>) {
     Object.assign(this, partial);
   }
+}
+
+export class UpdateAccountDto {
+  @IsEmail()
+  @IsOptional()
+  @MaxLength(100)
+  @ApiProperty({ example: 'user@example.com', required: false })
+  email: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(100)
+  @ApiProperty({ example: 'John', required: false })
+  first_name: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(100)
+  @ApiProperty({ example: 'Doe', required: false })
+  last_name: string;
 }

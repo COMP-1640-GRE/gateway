@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
 import { AccountStatus, User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { CompleteAccountDto as ActiveAccountDto } from './dto/auth.dto';
@@ -31,7 +32,8 @@ export class AuthService {
   async login(username: string, password: string) {
     try {
       const user = await this.validateUser(username, password);
-      const { id, role, secret, account_status } = user;
+      const { id, role, secret, account_status, email, first_name, last_name } =
+        user;
 
       // if user is not inactive
       if (account_status === AccountStatus.INACTIVE) {
@@ -49,10 +51,14 @@ export class AuthService {
         );
       }
 
-      const payload = {
+      const payload: JwtPayloadType = {
         id,
         username,
         role,
+        email,
+        first_name,
+        last_name,
+        account_status,
       };
 
       const access_token = await this.jwtService.signAsync(payload, { secret });

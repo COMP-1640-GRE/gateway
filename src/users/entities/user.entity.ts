@@ -47,6 +47,7 @@ export class User {
   role: UserRole;
 
   @Column({ nullable: true, unique: true })
+  @Index()
   email: string;
 
   @Column({ nullable: true })
@@ -63,10 +64,10 @@ export class User {
   account_status: AccountStatus;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);

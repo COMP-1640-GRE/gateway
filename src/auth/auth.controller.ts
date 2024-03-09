@@ -18,7 +18,7 @@ export class AuthController {
 
   @Public()
   @Patch('activate-account')
-  update(@Body() dto: CompleteAccountDto) {
+  activate(@Body() dto: CompleteAccountDto) {
     return this.authService.activate(dto);
   }
 }
