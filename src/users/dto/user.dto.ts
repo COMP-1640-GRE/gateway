@@ -2,6 +2,7 @@ import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsAlphanumeric,
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsLowercase,
@@ -111,4 +112,23 @@ export class AdminUpdateUserDto extends UpdateUserDto {
   @IsOptional()
   @IsPositive()
   faculty_id?: number;
+}
+
+export class ChangePasswordDto {
+  @IsString()
+  @MaxLength(64)
+  @ApiProperty({ example: 'superSecure@123' })
+  password: string;
+
+  @IsString()
+  @IsStrongPassword({
+    minLength: 8,
+    minNumbers: 1,
+    minSymbols: 1,
+    minUppercase: 1,
+    minLowercase: 1,
+  })
+  @MaxLength(64)
+  @ApiProperty({ example: 'superSecure@12' })
+  new_password: string;
 }

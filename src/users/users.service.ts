@@ -9,6 +9,7 @@ import { ListRequestDto } from 'src/utils/list.dto';
 import { Repository } from 'typeorm';
 import {
   AdminUpdateUserDto,
+  ChangePasswordDto,
   CreateUsersDto,
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
@@ -169,5 +170,26 @@ export class UsersService {
     }
     delete dto.faculty_id;
     return this.usersRepository.update(id, { ...dto, faculty });
+  }
+
+  async changePassword(
+    id: number,
+    { password, new_password }: ChangePasswordDto,
+  ) {
+    const user = await this.findById(id);
+
+    if (!user) {
+      throw new BadRequestException(`User with id ${id} not found`);
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      throw new BadRequestException('Incorrect password');
+    }
+
+    const hashedPassword = await bcrypt.hash(new_password, 10);
+
+    return this.usersRepository.update(id, { password: hashedPassword });
   }
 }

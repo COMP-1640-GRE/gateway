@@ -30,7 +30,7 @@ export class CompleteAccountDto {
   })
   @MaxLength(64)
   @ApiProperty({ example: 'superSecure@123' })
-  newPassword: string;
+  new_password: string;
 
   @IsEmail()
   @MaxLength(100)

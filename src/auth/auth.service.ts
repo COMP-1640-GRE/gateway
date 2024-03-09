@@ -88,7 +88,7 @@ export class AuthService {
   }
 
   async activate(dto: ActiveAccountDto) {
-    const { username, password, newPassword, email, first_name, last_name } =
+    const { username, password, new_password, email, first_name, last_name } =
       dto;
 
     const user = await this.usersService.findByUsername(username);
@@ -100,7 +100,7 @@ export class AuthService {
       );
     }
 
-    user.password = await bcrypt.hash(newPassword, 10);
+    user.password = await bcrypt.hash(new_password, 10);
     user.email = email;
     user.first_name = first_name;
     user.last_name = last_name;
@@ -108,6 +108,6 @@ export class AuthService {
 
     await this.usersService.update(user);
 
-    return this.login(username, newPassword);
+    return this.login(username, new_password);
   }
 }

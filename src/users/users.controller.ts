@@ -13,6 +13,7 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { ListRequestDto } from 'src/utils/list.dto';
 import {
   AdminUpdateUserDto,
+  ChangePasswordDto,
   CreateUsersDto,
   UpdateUserDto,
 } from './dto/user.dto';
@@ -62,4 +63,19 @@ export class UsersController {
   adminUpdate(@Param('id') userId: string, @Body() dto: AdminUpdateUserDto) {
     return this.userService.adminUpdate(+userId, dto);
   }
+
+  @Post('change-password')
+  changePassword(
+    @Body() dto: ChangePasswordDto,
+    @JwtPayload() { id }: JwtPayloadType,
+  ) {
+    return this.userService.changePassword(+id, dto);
+  }
+
+  // @Post('forgot-password')
+  // forgotPassword
+
+  // @Post('reset-password')
+  // @Roles(UserRole.ADMINISTRATOR)
+  // resetPassword
 }
