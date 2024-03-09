@@ -1,9 +1,11 @@
 import { Exclude } from 'class-transformer';
+import { Faculty } from 'src/faculties/entities/faculty.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   Index,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -21,8 +23,9 @@ export enum AccountStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
 }
+export const USER_ENTITY = 'user';
 
-@Entity({ name: 'user' })
+@Entity({ name: USER_ENTITY })
 export class User {
   @PrimaryGeneratedColumn()
   id!: number;
@@ -68,6 +71,14 @@ export class User {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @ManyToOne(() => Faculty, (faculty) => faculty.users, {
+    eager: true,
+    nullable: true,
+    onDelete: 'NO ACTION',
+    onUpdate: 'NO ACTION',
+  })
+  faculty: Faculty;
 
   constructor(partial: Partial<User>) {
     Object.assign(this, partial);

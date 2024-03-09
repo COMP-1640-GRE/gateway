@@ -7,12 +7,14 @@ import {
   IsString,
   IsStrongPassword,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 import { User, UserRole } from '../entities/user.entity';
 
 export class UserDto {
   @IsString()
   @MaxLength(64)
+  @MinLength(4)
   @ApiProperty({ example: 'student' })
   username: string;
 
@@ -54,18 +56,21 @@ export class CreateUsersResponseDto {
 export class UpdateAccountDto {
   @IsEmail()
   @IsOptional()
+  @MinLength(1)
   @MaxLength(100)
   @ApiProperty({ example: 'user@example.com', required: false })
   email: string;
 
   @IsString()
   @IsOptional()
+  @MinLength(1)
   @MaxLength(100)
   @ApiProperty({ example: 'John', required: false })
   first_name: string;
 
   @IsString()
   @IsOptional()
+  @MinLength(1)
   @MaxLength(100)
   @ApiProperty({ example: 'Doe', required: false })
   last_name: string;

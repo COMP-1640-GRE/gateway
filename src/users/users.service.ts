@@ -10,7 +10,7 @@ import {
   CreateUsersDto,
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
-import { User, UserRole } from './entities/user.entity';
+import { USER_ENTITY, User, UserRole } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
@@ -68,14 +68,13 @@ export class UsersService {
   async findAll(dto: ListRequestDto): Promise<ListResponseDto<User>> {
     const { filters, sorts, limit, offset, page } = dto;
     const queryBuilder = this.usersRepository
-      .createQueryBuilder('user')
+      .createQueryBuilder(USER_ENTITY)
       .limit(limit)
       .offset(offset);
 
     if (filters) {
       parseFilter(filters).forEach(({ value, field, operator }) => {
-        console.log(field, operator, value);
-        queryBuilder.andWhere(`user.${field} ${operator} :value`, {
+        queryBuilder.andWhere(`${USER_ENTITY}.${field} ${operator} :value`, {
           value,
         });
       });
@@ -83,7 +82,7 @@ export class UsersService {
 
     if (sorts) {
       parseSort(sorts).forEach(({ field, direction }) => {
-        queryBuilder.addOrderBy(`user.${field}`, direction);
+        queryBuilder.addOrderBy(`${USER_ENTITY}.${field}`, direction);
       });
     }
     try {

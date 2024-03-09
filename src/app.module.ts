@@ -10,6 +10,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
 import { RolesGuard } from './auth/roles.guard';
 import { UsersModule } from './users/users.module';
+import { FacultiesModule } from './faculties/faculties.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { UsersModule } from './users/users.module';
     }),
     AuthModule,
     UsersModule,
+    FacultiesModule,
   ],
   controllers: [],
   providers: [
