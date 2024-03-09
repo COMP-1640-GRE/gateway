@@ -30,6 +30,10 @@ export class FacultiesService {
     return id;
   }
 
+  async findById(id: number) {
+    return await this.facultiesRepository.findOneBy({ id });
+  }
+
   async update(id: number, dto: CreateFacultyDto) {
     try {
       return await this.facultiesRepository.update(id, dto);

@@ -23,7 +23,6 @@ export class Faculty {
   @OneToMany(() => User, (user) => user.faculty, {
     onDelete: 'SET NULL',
     nullable: true,
-    onUpdate: 'NO ACTION',
   })
   users: User[];
 

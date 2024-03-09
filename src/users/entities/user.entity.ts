@@ -75,8 +75,7 @@ export class User {
   @ManyToOne(() => Faculty, (faculty) => faculty.users, {
     eager: true,
     nullable: true,
-    onDelete: 'NO ACTION',
-    onUpdate: 'NO ACTION',
+    onDelete: 'SET NULL',
   })
   faculty: Faculty;
 

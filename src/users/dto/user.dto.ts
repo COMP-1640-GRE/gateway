@@ -4,6 +4,7 @@ import {
   IsEmail,
   IsEnum,
   IsOptional,
+  IsPositive,
   IsString,
   IsStrongPassword,
   MaxLength,
@@ -41,6 +42,14 @@ export class CreateUsersDto {
   @ApiProperty({ example: 'student' })
   @IsEnum(UserRole)
   role: UserRole;
+
+  @ApiProperty({
+    example: 1,
+    required: false,
+  })
+  @IsOptional()
+  @IsPositive()
+  faculty_id?: number;
 }
 
 export class CreateUsersResponseDto {

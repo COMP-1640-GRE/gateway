@@ -11,12 +11,15 @@ import {
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
 import { USER_ENTITY, User, UserRole } from './entities/user.entity';
+import { FacultiesService } from 'src/faculties/faculties.service';
+import { Faculty } from 'src/faculties/entities/faculty.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private facultiesService: FacultiesService,
   ) {
     // check if users table is empty
     this.usersRepository.count().then((count) => {
@@ -40,6 +43,7 @@ export class UsersService {
   async createUsers({
     users,
     role,
+    faculty_id,
   }: CreateUsersDto): Promise<UsersResponseDto> {
     // Check if any user already exists with Promise.race
     const user = await Promise.race(
@@ -50,11 +54,34 @@ export class UsersService {
       throw new BadRequestException(`User ${user.username} already exists`);
     }
 
+    let faculty: Faculty;
+
+    // get the faculty
+    if (faculty_id) {
+      faculty = await this.facultiesService.findById(faculty_id);
+      console.log(faculty);
+
+      if (!faculty) {
+        throw new BadRequestException(
+          `Faculty with id ${faculty_id} not found`,
+        );
+      }
+      if (
+        role === UserRole.ADMINISTRATOR ||
+        role === UserRole.UNIVERSITY_MARKETING_MANAGER
+      ) {
+        throw new BadRequestException(
+          `User with role ${role} cannot be assigned to a faculty`,
+        );
+      }
+    }
+
     // Hash the passwords
     const usersToCreate = await Promise.all(
       users.map(async (user) => ({
         ...user,
         role,
+        faculty,
         secret: nanoid(),
         password: await bcrypt.hash(user.password, 10),
       })),
