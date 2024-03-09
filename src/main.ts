@@ -8,6 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({}));
   app.use(cookieParser());
+  app.enableCors({
+    origin: (_, callback) => callback(null, true),
+    credentials: true,
+  });
 
   const swaggerConfig = new DocumentBuilder()
     // .setTitle()
