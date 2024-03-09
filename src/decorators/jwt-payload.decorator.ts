@@ -17,5 +17,5 @@ export type JwtPayloadType = {
   email?: string;
   first_name?: string;
   last_name?: string;
-  faculty?: string;
+  faculty_id?: number;
 };

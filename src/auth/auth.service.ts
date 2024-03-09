@@ -1,10 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { Response } from 'express';
 import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
 import { AccountStatus, User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { CompleteAccountDto as ActiveAccountDto } from './dto/auth.dto';
+import { TOKEN_KEY } from './jwt.strategy';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +31,7 @@ export class AuthService {
     return user;
   }
 
-  async login(username: string, password: string) {
+  async login(res: Response, username: string, password: string) {
     try {
       const user = await this.validateUser(username, password);
       const {
@@ -67,19 +69,16 @@ export class AuthService {
         first_name,
         last_name,
         account_status,
-        faculty: faculty?.name,
+        faculty_id: faculty?.id,
       };
 
       const access_token = await this.jwtService.signAsync(payload, { secret });
 
-      if (!access_token) {
-        return null;
-      }
+      res.cookie(TOKEN_KEY, access_token);
 
-      return {
-        access_token,
-      };
+      return user;
     } catch (error) {
+      console.log(error);
       throw new HttpException(
         'Incorrect username or password',
         HttpStatus.UNPROCESSABLE_ENTITY,
@@ -87,7 +86,7 @@ export class AuthService {
     }
   }
 
-  async activate(dto: ActiveAccountDto) {
+  async activate(res: Response, dto: ActiveAccountDto) {
     const { username, password, new_password, email, first_name, last_name } =
       dto;
 
@@ -108,6 +107,6 @@ export class AuthService {
 
     await this.usersService.update(user);
 
-    return this.login(username, new_password);
+    return this.login(res, username, new_password);
   }
 }

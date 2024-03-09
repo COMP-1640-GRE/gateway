@@ -6,12 +6,12 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
+import { JwtGuard } from './auth/jwt.guard';
 import { RolesGuard } from './auth/roles.guard';
-import { UsersModule } from './users/users.module';
 import { FacultiesModule } from './faculties/faculties.module';
 import { PeriodsModule } from './periods/periods.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -42,7 +42,8 @@ import { PeriodsModule } from './periods/periods.module';
   providers: [
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
+      // useClass: AuthGuard,
+      useClass: JwtGuard,
     },
     {
       provide: APP_GUARD,
