@@ -8,6 +8,9 @@ import {
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
 import { User, UserRole } from './entities/user.entity';
+import { ListRequestDto, ListResponseDto } from 'src/utils/list.dto';
+import { parseFilter } from 'src/utils/filter-parser';
+import { parseSort } from 'src/utils/sort-parser';
 
 @Injectable()
 export class UsersService {
@@ -60,6 +63,41 @@ export class UsersService {
     return new UsersResponseDto({
       data: await this.usersRepository.save(usersToCreate),
     });
+  }
+
+  async findAll(dto: ListRequestDto): Promise<ListResponseDto<User>> {
+    const { filters, sorts, limit, offset, page } = dto;
+    const queryBuilder = this.usersRepository
+      .createQueryBuilder('user')
+      .limit(limit)
+      .offset(offset);
+
+    if (filters) {
+      parseFilter(filters).forEach(({ value, field, operator }) => {
+        console.log(field, operator, value);
+        queryBuilder.andWhere(`user.${field} ${operator} :value`, {
+          value,
+        });
+      });
+    }
+
+    if (sorts) {
+      parseSort(sorts).forEach(({ field, direction }) => {
+        queryBuilder.addOrderBy(`user.${field}`, direction);
+      });
+    }
+    try {
+      const [data, total] = await queryBuilder.getManyAndCount();
+
+      return {
+        data,
+        total,
+        page,
+        count: data.length,
+      };
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   async findById(id: number): Promise<User> {

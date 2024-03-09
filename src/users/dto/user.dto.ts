@@ -2,6 +2,7 @@ import { IsEnum, IsString, IsStrongPassword, MaxLength } from 'class-validator';
 import { User, UserRole } from '../entities/user.entity';
 import { ApiProperty, ApiResponseProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { ListRequestDto } from 'src/utils/list.dto';
 
 export class UserDto {
   @IsString()
