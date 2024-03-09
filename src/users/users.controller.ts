@@ -72,10 +72,13 @@ export class UsersController {
     return this.userService.changePassword(+id, dto);
   }
 
+  // TODO: send email or send a notification to the administrator to reset the password
   // @Post('forgot-password')
   // forgotPassword
 
-  // @Post('reset-password')
-  // @Roles(UserRole.ADMINISTRATOR)
-  // resetPassword
+  @Post('reset-password/:id')
+  @Roles(UserRole.ADMINISTRATOR)
+  resetPassword(@Param('id') id: string) {
+    return this.userService.resetPassword(+id);
+  }
 }

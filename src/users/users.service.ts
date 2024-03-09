@@ -13,10 +13,17 @@ import {
   CreateUsersDto,
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
-import { USER_ENTITY, User, UserRole } from './entities/user.entity';
+import {
+  AccountStatus,
+  USER_ENTITY,
+  User,
+  UserRole,
+} from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
+  private defaultPassword = process.env.DEFAULT_PASSWORD || '1234@Abcd';
+
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -26,15 +33,14 @@ export class UsersService {
     this.usersRepository.count().then((count) => {
       // if table is empty, create administrator user
       if (count === 0) {
-        const password = nanoid();
         const username = 'admin';
 
         this.createUsers({
-          users: [{ username, password }],
+          usernames: [username],
           role: UserRole.ADMINISTRATOR,
         }).then(() => {
           Logger.log(
-            `'Administrator user created with username: ${username} and password: ${password}`,
+            `'Administrator user created with username: ${username} and password: ${this.defaultPassword}`,
           );
         });
       }
@@ -42,13 +48,13 @@ export class UsersService {
   }
 
   async createUsers({
-    users,
+    usernames,
     role,
     faculty_id,
   }: CreateUsersDto): Promise<UsersResponseDto> {
     // Check if any user already exists with Promise.race
     const user = await Promise.race(
-      users.map((user) => this.findByUsername(user.username)),
+      usernames.map((username) => this.findByUsername(username)),
     );
 
     if (user) {
@@ -75,15 +81,15 @@ export class UsersService {
         );
       }
     }
-
+    const password = await bcrypt.hash(this.defaultPassword, 10);
     // Hash the passwords
     const usersToCreate = await Promise.all(
-      users.map(async (user) => ({
-        ...user,
+      usernames.map(async (username) => ({
+        username,
         role,
         faculty,
+        password,
         secret: nanoid(),
-        password: await bcrypt.hash(user.password, 10),
       })),
     );
 
@@ -191,5 +197,19 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(new_password, 10);
 
     return this.usersRepository.update(id, { password: hashedPassword });
+  }
+
+  async resetPassword(id: number) {
+    const user = await this.findById(id);
+    if (!user) {
+      throw new BadRequestException(`User with id ${id} not found`);
+    }
+
+    const password = await bcrypt.hash(this.defaultPassword, 10);
+    return this.usersRepository.update(id, {
+      password,
+      secret: nanoid(),
+      account_status: AccountStatus.INACTIVE,
+    });
   }
 }
