@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/roles.decorator';
 import { ListRequestDto } from 'src/utils/list.dto';
@@ -30,5 +39,17 @@ export class UsersController {
   @Patch()
   update(@Body() dto: UpdateAccountDto, @JwtPayload() { id }: JwtPayloadType) {
     return this.userService.update({ id, ...dto });
+  }
+
+  // TODO: find one user that can list all it's paginated contributions.
+  // @Get(':username')
+  // findByUsername(@Param('id') username: string) {
+  //   return this.userService.findOneByUsername(username);
+  // }
+
+  @Delete(':id')
+  @Roles(UserRole.ADMINISTRATOR)
+  remove(@Param('id') userId: string, @JwtPayload() { id }: JwtPayloadType) {
+    return this.userService.remove(+id, +userId);
   }
 }

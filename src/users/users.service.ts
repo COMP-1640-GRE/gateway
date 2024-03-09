@@ -151,4 +151,11 @@ export class UsersService {
 
     return this.usersRepository.save(user);
   }
+
+  async remove(currentId: number, id: number) {
+    if (currentId === id) {
+      throw new BadRequestException('You cannot delete yourself');
+    }
+    return this.usersRepository.delete(id);
+  }
 }

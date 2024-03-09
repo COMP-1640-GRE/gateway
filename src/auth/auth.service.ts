@@ -32,8 +32,16 @@ export class AuthService {
   async login(username: string, password: string) {
     try {
       const user = await this.validateUser(username, password);
-      const { id, role, secret, account_status, email, first_name, last_name } =
-        user;
+      const {
+        id,
+        role,
+        secret,
+        account_status,
+        email,
+        first_name,
+        last_name,
+        faculty,
+      } = user;
 
       // if user is not inactive
       if (account_status === AccountStatus.INACTIVE) {
@@ -59,6 +67,7 @@ export class AuthService {
         first_name,
         last_name,
         account_status,
+        faculty: faculty?.name,
       };
 
       const access_token = await this.jwtService.signAsync(payload, { secret });

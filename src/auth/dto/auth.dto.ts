@@ -16,15 +16,8 @@ export class CompleteAccountDto {
   username: string;
 
   @IsString()
-  @IsStrongPassword({
-    minLength: 8,
-    minNumbers: 1,
-    minUppercase: 1,
-    minSymbols: 1,
-    minLowercase: 1,
-  })
   @MaxLength(64)
-  @ApiProperty({ example: 'superSecure@123' })
+  @ApiProperty({ example: 'superSecure@12' })
   password: string;
 
   @IsString()
