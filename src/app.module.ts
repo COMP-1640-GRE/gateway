@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { RolesGuard } from './auth/roles.guard';
 import { UsersModule } from './users/users.module';
 import { FacultiesModule } from './faculties/faculties.module';
+import { PeriodsModule } from './periods/periods.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { FacultiesModule } from './faculties/faculties.module';
     AuthModule,
     UsersModule,
     FacultiesModule,
+    PeriodsModule,
   ],
   controllers: [],
   providers: [

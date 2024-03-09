@@ -1,8 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateFacultyDto } from './dto/create-faculty.dto';
+import { CreateFacultyDto } from './dto/faculty.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Faculty } from './entities/faculty.entity';
+import { FACULTY_ENTITY, Faculty } from './entities/faculty.entity';
 import { Repository } from 'typeorm';
+import { ListRequestDto } from 'src/utils/list.dto';
+import { getList } from 'src/utils/list';
 
 @Injectable()
 export class FacultiesService {
@@ -21,8 +23,8 @@ export class FacultiesService {
     }
   }
 
-  findAll() {
-    return this.facultiesRepository.find();
+  async findAll(dto: ListRequestDto) {
+    return getList(FACULTY_ENTITY, dto, this.facultiesRepository);
   }
 
   findOne(id: number) {

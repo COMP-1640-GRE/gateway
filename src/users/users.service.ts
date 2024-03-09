@@ -4,9 +4,8 @@ import * as bcrypt from 'bcrypt';
 import { nanoid } from 'nanoid';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
 import { FacultiesService } from 'src/faculties/faculties.service';
-import { parseFilter } from 'src/utils/filter-parser';
-import { ListRequestDto, ListResponseDto } from 'src/utils/list.dto';
-import { parseSort } from 'src/utils/sort-parser';
+import { getList } from 'src/utils/list';
+import { ListRequestDto } from 'src/utils/list.dto';
 import { Repository } from 'typeorm';
 import {
   AdminUpdateUserDto,
@@ -92,38 +91,8 @@ export class UsersService {
     });
   }
 
-  async findAll(dto: ListRequestDto): Promise<ListResponseDto<User>> {
-    const { filters, sorts, limit, offset, page } = dto;
-    const queryBuilder = this.usersRepository
-      .createQueryBuilder(USER_ENTITY)
-      .limit(limit)
-      .offset(offset);
-
-    if (filters) {
-      parseFilter(filters).forEach(({ value, field, operator }) => {
-        queryBuilder.andWhere(`${USER_ENTITY}.${field} ${operator} :value`, {
-          value,
-        });
-      });
-    }
-
-    if (sorts) {
-      parseSort(sorts).forEach(({ field, direction }) => {
-        queryBuilder.addOrderBy(`${USER_ENTITY}.${field}`, direction);
-      });
-    }
-    try {
-      const [data, total] = await queryBuilder.getManyAndCount();
-
-      return {
-        data,
-        total,
-        page,
-        count: data.length,
-      };
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
+  async findAll(dto: ListRequestDto) {
+    return getList(USER_ENTITY, dto, this.usersRepository);
   }
 
   async findById(id: number): Promise<User> {

@@ -6,12 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { FacultiesService } from './faculties.service';
-import { CreateFacultyDto } from './dto/create-faculty.dto';
+import { CreateFacultyDto } from './dto/faculty.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
 import { ApiTags } from '@nestjs/swagger';
+import { ListRequestDto } from 'src/utils/list.dto';
 
 @ApiTags('Faculties')
 @Controller('faculties')
@@ -25,8 +27,8 @@ export class FacultiesController {
   }
 
   @Get()
-  findAll() {
-    return this.facultiesService.findAll();
+  findAll(@Query() dto: ListRequestDto) {
+    return this.facultiesService.findAll(dto);
   }
 
   @Get(':id')

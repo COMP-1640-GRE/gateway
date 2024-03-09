@@ -1,3 +1,4 @@
+import { Period } from 'src/periods/entities/period.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -20,15 +21,15 @@ export class Faculty {
   @Index()
   name: string;
 
-  @OneToMany(() => User, (user) => user.faculty, {
-    onDelete: 'SET NULL',
-    nullable: true,
-  })
-  users: User[];
-
   @CreateDateColumn()
   created_at: Date;
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @OneToMany(() => User, (user) => user.faculty)
+  users: User[];
+
+  @OneToMany(() => Period, (period) => period.faculty)
+  periods: Period[];
 }
