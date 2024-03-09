@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
@@ -19,71 +24,76 @@ export class AuthService {
     const user = await this.usersService.findByUsername(username);
 
     if (!user) {
-      return null;
+      throw new HttpException(
+        'Incorrect username or password',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      return null;
+      throw new HttpException(
+        'Incorrect username or password',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
 
     return user;
   }
 
   async login(res: Response, username: string, password: string) {
-    try {
-      const user = await this.validateUser(username, password);
-      const {
-        id,
-        role,
-        secret,
-        account_status,
-        email,
-        first_name,
-        last_name,
-        faculty,
-      } = user;
+    const user = await this.validateUser(username, password);
+    const {
+      id,
+      role,
+      secret,
+      account_status,
+      email,
+      first_name,
+      last_name,
+      faculty,
+    } = user;
 
-      // if user is not inactive
-      if (account_status === AccountStatus.INACTIVE) {
-        return new HttpException(
-          'You have to activate your account first',
-          HttpStatus.FORBIDDEN,
-        );
-      }
+    const payload: JwtPayloadType = {
+      id,
+      username,
+      role,
+      email,
+      first_name,
+      last_name,
+      account_status,
+      faculty_id: faculty?.id,
+    };
 
-      // if user is locked
-      if (account_status === AccountStatus.LOCKED) {
-        return new HttpException(
-          'Your account is locked. Please contact administrator',
-          HttpStatus.FORBIDDEN,
-        );
-      }
+    // if user is not inactive
+    if (account_status === AccountStatus.INACTIVE) {
+      const temp_token = await this.jwtService.signAsync(payload, {
+        secret: 'temp_secret',
+      });
+      res.cookie('temp_token', temp_token, {
+        sameSite: 'none',
+        secure: true,
+      });
 
-      const payload: JwtPayloadType = {
-        id,
-        username,
-        role,
-        email,
-        first_name,
-        last_name,
-        account_status,
-        faculty_id: faculty?.id,
-      };
-
-      const access_token = await this.jwtService.signAsync(payload, { secret });
-
-      res.cookie(TOKEN_KEY, access_token);
-
-      return user;
-    } catch (error) {
-      console.log(error);
       throw new HttpException(
-        'Incorrect username or password',
-        HttpStatus.UNPROCESSABLE_ENTITY,
+        'You have to activate your account first',
+        HttpStatus.PRECONDITION_REQUIRED,
       );
     }
+
+    // if user is locked
+    if (account_status === AccountStatus.LOCKED) {
+      throw new ForbiddenException(
+        'Your account is locked. Please contact administrator',
+      );
+    }
+
+    const access_token = await this.jwtService.signAsync(payload, { secret });
+
+    res.cookie(TOKEN_KEY, access_token, { sameSite: 'none', secure: true });
+
+    return user;
   }
 
   async activate(res: Response, dto: ActiveAccountDto) {
