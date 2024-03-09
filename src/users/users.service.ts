@@ -2,15 +2,15 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { nanoid } from 'nanoid';
+import { parseFilter } from 'src/utils/filter-parser';
+import { ListRequestDto, ListResponseDto } from 'src/utils/list.dto';
+import { parseSort } from 'src/utils/sort-parser';
 import { Repository } from 'typeorm';
 import {
   CreateUsersDto,
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
 import { User, UserRole } from './entities/user.entity';
-import { ListRequestDto, ListResponseDto } from 'src/utils/list.dto';
-import { parseFilter } from 'src/utils/filter-parser';
-import { parseSort } from 'src/utils/sort-parser';
 
 @Injectable()
 export class UsersService {
@@ -106,5 +106,9 @@ export class UsersService {
 
   async findByUsername(username: string): Promise<User> {
     return this.usersRepository.findOneBy({ username });
+  }
+
+  async update(user: Partial<User>): Promise<User> {
+    return this.usersRepository.save(user);
   }
 }

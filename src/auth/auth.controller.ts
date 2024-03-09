@@ -1,8 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Patch, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
 import { LoginDto } from './auth.dto';
 import { AuthService } from './auth.service';
+import { CompleteAccountDto } from './dto/auth.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -13,5 +14,11 @@ export class AuthController {
   @Post('login')
   async login(@Body() { username, password }: LoginDto) {
     return this.authService.login(username, password);
+  }
+
+  @Public()
+  @Patch('activate-account')
+  update(@Body() dto: CompleteAccountDto) {
+    return this.authService.activate(dto);
   }
 }

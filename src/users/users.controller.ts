@@ -11,8 +11,8 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @Roles(UserRole.ADMINISTRATOR)
   @Post('creates')
+  @Roles(UserRole.ADMINISTRATOR)
   async createMultipleUsers(@Body() dto: CreateUsersDto) {
     return await this.userService.createUsers(dto);
   }

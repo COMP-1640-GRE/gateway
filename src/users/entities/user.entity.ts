@@ -1,9 +1,9 @@
 import { Exclude } from 'class-transformer';
-import { IsEmail } from 'class-validator';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -28,6 +28,7 @@ export class User {
   id!: number;
 
   @Column({ unique: true })
+  @Index()
   username: string;
 
   @Column()
@@ -46,7 +47,6 @@ export class User {
   role: UserRole;
 
   @Column({ nullable: true, unique: true })
-  @IsEmail()
   email: string;
 
   @Column({ nullable: true })
