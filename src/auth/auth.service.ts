@@ -66,20 +66,12 @@ export class AuthService {
       faculty_id: faculty?.id,
     };
 
-    // if user is not inactive
+    // if user is not active
     if (account_status === AccountStatus.INACTIVE) {
-      const temp_token = await this.jwtService.signAsync(payload, {
-        secret: 'temp_secret',
-      });
-      res.cookie('temp_token', temp_token, {
-        sameSite: 'none',
-        secure: true,
-      });
+      res.status(HttpStatus.PRECONDITION_REQUIRED);
+      res.statusMessage = 'You must activate your account';
 
-      throw new HttpException(
-        'You have to activate your account first',
-        HttpStatus.PRECONDITION_REQUIRED,
-      );
+      return user;
     }
 
     // if user is locked
