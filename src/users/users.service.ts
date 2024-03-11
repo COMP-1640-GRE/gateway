@@ -105,15 +105,15 @@ export class UsersService extends TypeOrmCrudService<User> {
   }
 
   async findById(id: number): Promise<User> {
-    return this.usersRepository.findOneBy({ id: id });
+    return this.usersRepository.findOne({ id: id });
   }
 
   async findByUsername(username: string): Promise<User> {
-    return this.usersRepository.findOneBy({ username });
+    return this.usersRepository.findOne({ username });
   }
 
   async findByEmail(email: string): Promise<User> {
-    return this.usersRepository.findOneBy({ email });
+    return this.usersRepository.findOne({ email });
   }
 
   async update(user: Partial<User>): Promise<User> {

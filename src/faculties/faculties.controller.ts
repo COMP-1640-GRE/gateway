@@ -19,12 +19,6 @@ import { FacultiesService } from './faculties.service';
   },
   query: {
     limit: 100,
-    join: {
-      periods: {
-        eager: true,
-        required: false,
-      },
-    },
     cache: 200,
   },
   routes: {

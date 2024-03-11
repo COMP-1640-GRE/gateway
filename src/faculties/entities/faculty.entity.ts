@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -15,7 +16,7 @@ export const FACULTY_ENTITY = 'faculty';
 @Entity({ name: FACULTY_ENTITY })
 export class Faculty {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id: number;
 
   @Column({ unique: true })
   @Index()
@@ -28,6 +29,7 @@ export class Faculty {
   updated_at: Date;
 
   @OneToMany(() => User, (user) => user.faculty)
+  @JoinColumn({ name: 'id', referencedColumnName: 'faculty_id' })
   users: User[];
 
   @OneToMany(() => Period, (period) => period.faculty)

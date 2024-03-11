@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -76,6 +77,10 @@ export class User {
     eager: true,
     nullable: true,
     onDelete: 'SET NULL',
+  })
+  @JoinColumn({
+    name: 'faculty_id',
+    referencedColumnName: 'id',
   })
   faculty: Faculty;
 

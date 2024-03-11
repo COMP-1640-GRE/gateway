@@ -15,12 +15,14 @@ import {
 import { User, UserRole } from '../entities/user.entity';
 
 export class CreateUsersDto {
-  @IsString()
-  @MinLength(4)
-  @MaxLength(64)
-  @IsLowercase()
-  @IsAlphanumeric()
-  @ApiProperty({ example: 'john', isArray: true })
+  @MinLength(4, { each: true })
+  @MaxLength(64, { each: true })
+  @IsLowercase({ each: true })
+  @IsAlphanumeric('en-US', {
+    each: true,
+  })
+  @IsString({ each: true })
+  @ApiProperty({ example: ['john'], isArray: true })
   usernames: string[];
 
   @ApiProperty({ example: 'student' })
