@@ -1,50 +1,60 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  Query,
-} from '@nestjs/common';
-import { FacultiesService } from './faculties.service';
-import { CreateFacultyDto } from './dto/faculty.dto';
+import { Controller } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { Crud, CrudController } from '@nestjsx/crud';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
-import { ApiTags } from '@nestjs/swagger';
-import { ListRequestDto } from 'src/utils/list.dto';
+import { CreateFacultyDto } from './dto/faculty.dto';
+import { Faculty } from './entities/faculty.entity';
+import { FacultiesService } from './faculties.service';
 
 @ApiTags('Faculties')
 @Controller('faculties')
-export class FacultiesController {
-  constructor(private readonly facultiesService: FacultiesService) {}
-
-  @Post()
-  @Roles(UserRole.ADMINISTRATOR)
-  create(@Body() createFacultyDto: CreateFacultyDto) {
-    return this.facultiesService.create(createFacultyDto);
-  }
-
-  @Get()
-  findAll(@Query() dto: ListRequestDto) {
-    return this.facultiesService.findAll(dto);
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.facultiesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  @Roles(UserRole.ADMINISTRATOR)
-  update(@Param('id') id: string, @Body() updateFacultyDto: CreateFacultyDto) {
-    return this.facultiesService.update(+id, updateFacultyDto);
-  }
-
-  @Delete(':id')
-  @Roles(UserRole.ADMINISTRATOR)
-  remove(@Param('id') id: string) {
-    return this.facultiesService.remove(+id);
-  }
+@Crud({
+  model: {
+    type: Faculty,
+  },
+  dto: {
+    create: CreateFacultyDto,
+    update: CreateFacultyDto,
+  },
+  query: {
+    limit: 100,
+    join: {
+      faculty: {
+        eager: true,
+        required: false,
+      },
+    },
+    cache: 200,
+  },
+  routes: {
+    only: [
+      'getManyBase',
+      'createOneBase',
+      'updateOneBase',
+      'deleteOneBase',
+      'getOneBase',
+    ],
+    getManyBase: {},
+    createOneBase: {
+      decorators: [Roles(UserRole.ADMINISTRATOR)],
+    },
+    updateOneBase: {
+      decorators: [Roles(UserRole.ADMINISTRATOR)],
+    },
+    deleteOneBase: {
+      decorators: [Roles(UserRole.ADMINISTRATOR)],
+    },
+    getOneBase: {},
+  },
+  params: {
+    id: {
+      type: 'number',
+      primary: true,
+      field: 'id',
+    },
+  },
+})
+export class FacultiesController implements CrudController<Faculty> {
+  constructor(public service: FacultiesService) {}
 }

@@ -1,52 +1,18 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateFacultyDto } from './dto/faculty.dto';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FACULTY_ENTITY, Faculty } from './entities/faculty.entity';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Repository } from 'typeorm';
-import { ListRequestDto } from 'src/utils/list.dto';
-import { getList } from 'src/utils/list';
+import { Faculty } from './entities/faculty.entity';
 
 @Injectable()
-export class FacultiesService {
+export class FacultiesService extends TypeOrmCrudService<Faculty> {
   constructor(
     @InjectRepository(Faculty) private facultiesRepository: Repository<Faculty>,
-  ) {}
-
-  async create({ name }: CreateFacultyDto) {
-    //  name must be unique
-    try {
-      return await this.facultiesRepository.save({ name });
-    } catch (err) {
-      throw new BadRequestException({
-        message: `Faculty with name "${name}" already exists`,
-      });
-    }
-  }
-
-  async findAll(dto: ListRequestDto) {
-    return getList(FACULTY_ENTITY, dto, this.facultiesRepository);
-  }
-
-  findOne(id: number) {
-    // TODO: get a single faculty can return paginated users and periods
-    return id;
+  ) {
+    super(facultiesRepository);
   }
 
   async findById(id: number) {
     return await this.facultiesRepository.findOneBy({ id });
-  }
-
-  async update(id: number, dto: CreateFacultyDto) {
-    try {
-      return await this.facultiesRepository.update(id, dto);
-    } catch (error) {
-      throw new BadRequestException({
-        message: `Faculty with name "${dto.name}" already exists`,
-      });
-    }
-  }
-
-  remove(id: number) {
-    return this.facultiesRepository.delete(id);
   }
 }

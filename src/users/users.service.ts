@@ -19,9 +19,10 @@ import {
   User,
   UserRole,
 } from './entities/user.entity';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 @Injectable()
-export class UsersService {
+export class UsersService extends TypeOrmCrudService<User> {
   private defaultPassword = process.env.DEFAULT_PASSWORD || '1234@Abcd';
 
   constructor(
@@ -29,6 +30,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
     private facultiesService: FacultiesService,
   ) {
+    super(usersRepository);
     // check if users table is empty
     this.usersRepository.count().then((count) => {
       // if table is empty, create administrator user
