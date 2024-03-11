@@ -45,7 +45,7 @@ export class AuthService {
   async login(res: Response, username: string, password: string) {
     const user = await this.validateUser(username, password);
     const {
-      id,
+      id: id,
       role,
       secret,
       account_status,

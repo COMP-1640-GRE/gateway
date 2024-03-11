@@ -13,6 +13,6 @@ export class FacultiesService extends TypeOrmCrudService<Faculty> {
   }
 
   async findById(id: number) {
-    return await this.facultiesRepository.findOneBy({ id });
+    return await this.facultiesRepository.findOneBy({ id: id });
   }
 }

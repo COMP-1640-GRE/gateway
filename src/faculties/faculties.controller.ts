@@ -20,7 +20,7 @@ import { FacultiesService } from './faculties.service';
   query: {
     limit: 100,
     join: {
-      faculty: {
+      periods: {
         eager: true,
         required: false,
       },

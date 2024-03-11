@@ -6,13 +6,16 @@ import { ListRequestDto } from 'src/utils/list.dto';
 import { Repository } from 'typeorm';
 import { CreatePeriodDto } from './dto/period.dto';
 import { PERIOD_ENTITY, Period } from './entities/period.entity';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 @Injectable()
-export class PeriodsService {
+export class PeriodsService extends TypeOrmCrudService<Period> {
   constructor(
     @InjectRepository(Period) private periodsRepository: Repository<Period>,
     private facultiesService: FacultiesService,
-  ) {}
+  ) {
+    super(periodsRepository);
+  }
 
   async create(dto: CreatePeriodDto) {
     const { faculty_id, ...period } = dto;

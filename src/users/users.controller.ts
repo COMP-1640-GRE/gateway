@@ -60,7 +60,7 @@ export class UsersController implements CrudController<User> {
 
   @Patch()
   update(@Body() dto: UpdateUserDto, @JwtPayload() { id }: JwtPayloadType) {
-    return this.service.update({ id, ...dto });
+    return this.service.update({ id: id, ...dto });
   }
 
   // TODO: find one user that can list all it's paginated contributions.
