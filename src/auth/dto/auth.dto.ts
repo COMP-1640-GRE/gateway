@@ -25,7 +25,7 @@ export class LoginDto {
   @IsBoolean()
   @IsOptional()
   @ApiProperty({ example: true, required: false })
-  remember_me?: boolean;
+  remember?: boolean;
 }
 
 export class CompleteAccountDto {

@@ -46,7 +46,7 @@ export class AuthService {
     res: Response,
     username: string,
     password: string,
-    remember_me = false,
+    remember = false,
   ) {
     const user = await this.validateUser(username, password);
     const {
@@ -94,7 +94,7 @@ export class AuthService {
 
     res.cookie(TOKEN_KEY, access_token, { sameSite: 'none', secure: true });
 
-    if (remember_me) {
+    if (remember) {
       res.cookie(REFRESH_TOKEN_KEY, refresh_token, {
         sameSite: 'none',
         secure: true,
