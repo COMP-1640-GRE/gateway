@@ -6,9 +6,10 @@ import {
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
+import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
 import { IS_PUBLIC_KEY } from 'src/decorators/public.decorator';
 import { UsersService } from 'src/users/users.service';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy, REFRESH_TOKEN_KEY } from './jwt.strategy';
 
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
@@ -31,21 +32,39 @@ export class JwtGuard extends AuthGuard('jwt') {
 
     const request = context.switchToHttp().getRequest();
     const token = JwtStrategy.extractJWT(request);
+
     if (!token) {
       throw new UnauthorizedException();
     }
+
+    let payload: JwtPayloadType;
+
     try {
       const { id } = this.jwtService.decode(token);
-
       const { secret } = await this.usersService.findById(id);
+      payload = await this.jwtService.verifyAsync(token, { secret });
+    } catch (error) {
+      const refreshToken = JwtStrategy.extractCookies(
+        request,
+        REFRESH_TOKEN_KEY,
+      );
 
-      const payload = await this.jwtService.verifyAsync(token, { secret });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
-      request['user'] = payload;
-    } catch {
-      throw new UnauthorizedException();
+      if (refreshToken) {
+        try {
+          const { id } = this.jwtService.decode(refreshToken);
+          const { secret } = await this.usersService.findById(id);
+          payload = await this.jwtService.verifyAsync(refreshToken, {
+            secret,
+          });
+        } catch (error) {
+          throw new UnauthorizedException();
+        }
+      } else {
+        throw new UnauthorizedException();
+      }
     }
+
+    request['user'] = payload;
     return true;
   }
 }

@@ -4,6 +4,7 @@ import { Request as RequestType } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 export const TOKEN_KEY = 'access_token';
+export const REFRESH_TOKEN_KEY = 'refresh_token';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -18,12 +19,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   static extractJWT(req: RequestType): string | null {
+    return JwtStrategy.extractCookies(req, TOKEN_KEY);
+  }
+
+  static extractCookies(req: RequestType, cookieName: string): string | null {
     if (
       req.cookies &&
-      TOKEN_KEY in req.cookies &&
-      req.cookies[TOKEN_KEY].length > 0
+      cookieName in req.cookies &&
+      req.cookies[cookieName].length > 0
     ) {
-      return req.cookies[TOKEN_KEY];
+      return req.cookies[cookieName];
     }
     return null;
   }

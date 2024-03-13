@@ -1,7 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
   MaxLength,
@@ -19,6 +21,11 @@ export class LoginDto {
   @MaxLength(100)
   @ApiProperty({ example: 'superSecure@123' })
   password: string;
+
+  @IsBoolean()
+  @IsOptional()
+  @ApiProperty({ example: true, required: false })
+  remember_me?: boolean;
 }
 
 export class CompleteAccountDto {

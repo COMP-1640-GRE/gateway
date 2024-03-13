@@ -11,7 +11,7 @@ import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
 import { AccountStatus, User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { CompleteAccountDto as ActiveAccountDto } from './dto/auth.dto';
-import { TOKEN_KEY } from './jwt.strategy';
+import { REFRESH_TOKEN_KEY, TOKEN_KEY } from './jwt.strategy';
 
 @Injectable()
 export class AuthService {
@@ -42,7 +42,12 @@ export class AuthService {
     return user;
   }
 
-  async login(res: Response, username: string, password: string) {
+  async login(
+    res: Response,
+    username: string,
+    password: string,
+    remember_me = false,
+  ) {
     const user = await this.validateUser(username, password);
     const {
       id: id,
@@ -82,8 +87,19 @@ export class AuthService {
     }
 
     const access_token = await this.jwtService.signAsync(payload, { secret });
+    const refresh_token = await this.jwtService.signAsync(payload, {
+      secret,
+      expiresIn: '7d',
+    });
 
     res.cookie(TOKEN_KEY, access_token, { sameSite: 'none', secure: true });
+
+    if (remember_me) {
+      res.cookie(REFRESH_TOKEN_KEY, refresh_token, {
+        sameSite: 'none',
+        secure: true,
+      });
+    }
 
     return user;
   }
