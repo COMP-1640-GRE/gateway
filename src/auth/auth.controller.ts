@@ -2,7 +2,7 @@ import { Body, Controller, Get, Patch, Post, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorators/public.decorator';
 import { AuthService } from './auth.service';
-import { CompleteAccountDto, LoginDto } from './dto/auth.dto';
+import { ActiveAccountDto, LoginDto } from './dto/auth.dto';
 import { Response } from 'express';
 import { REFRESH_TOKEN_KEY, TOKEN_KEY } from './jwt.strategy';
 
@@ -24,7 +24,7 @@ export class AuthController {
   @Patch('activate-account')
   activate(
     @Res({ passthrough: true }) res: Response,
-    @Body() dto: CompleteAccountDto,
+    @Body() dto: ActiveAccountDto,
   ) {
     return this.authService.activate(res, dto);
   }

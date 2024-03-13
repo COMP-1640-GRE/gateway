@@ -10,7 +10,7 @@ import { Response } from 'express';
 import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
 import { AccountStatus, User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { CompleteAccountDto as ActiveAccountDto } from './dto/auth.dto';
+import { ActiveAccountDto } from './dto/auth.dto';
 import { REFRESH_TOKEN_KEY, TOKEN_KEY } from './jwt.strategy';
 
 @Injectable()
@@ -105,8 +105,15 @@ export class AuthService {
   }
 
   async activate(res: Response, dto: ActiveAccountDto) {
-    const { username, password, new_password, email, first_name, last_name } =
-      dto;
+    const {
+      username,
+      password,
+      new_password,
+      email,
+      first_name,
+      last_name,
+      remember,
+    } = dto;
 
     const user = await this.usersService.findByUsername(username);
     const isMatch = await bcrypt.compare(password, user.password);
@@ -125,6 +132,6 @@ export class AuthService {
 
     await this.usersService.update(user);
 
-    return this.login(res, username, new_password);
+    return this.login(res, username, new_password, remember);
   }
 }

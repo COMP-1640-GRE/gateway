@@ -28,7 +28,7 @@ export class LoginDto {
   remember?: boolean;
 }
 
-export class CompleteAccountDto {
+export class ActiveAccountDto {
   @IsString()
   @MaxLength(64)
   @MinLength(4)
@@ -68,4 +68,9 @@ export class CompleteAccountDto {
   @MaxLength(100)
   @ApiProperty({ example: 'Doe' })
   last_name: string;
+
+  @IsBoolean()
+  @IsOptional()
+  @ApiProperty({ example: true, required: false })
+  remember?: boolean;
 }
