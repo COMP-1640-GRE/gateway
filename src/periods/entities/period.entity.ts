@@ -20,7 +20,7 @@ export class Period {
   @Index()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @Column()

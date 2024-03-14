@@ -98,4 +98,10 @@ export class UsersController implements CrudController<User> {
   resetPassword(@Param('id') id: string) {
     return this.service.resetPassword(+id);
   }
+
+  @Patch(':id/lock')
+  @Roles(UserRole.ADMINISTRATOR)
+  lockUser(@Param('id') userId: string, @JwtPayload() { id }: JwtPayloadType) {
+    return this.service.lockUser(+userId, +id);
+  }
 }

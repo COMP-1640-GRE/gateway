@@ -214,4 +214,22 @@ export class UsersService extends TypeOrmCrudService<User> {
       account_status: AccountStatus.INACTIVE,
     });
   }
+
+  async lockUser(id: number, currentId: number) {
+    if (currentId === id) {
+      throw new BadRequestException('You cannot lock yourself');
+    }
+
+    const user = await this.findById(id);
+    if (!user) {
+      throw new BadRequestException(`User with id ${id} not found`);
+    }
+    const account_status =
+      user.account_status === AccountStatus.LOCKED
+        ? AccountStatus.INACTIVE
+        : AccountStatus.LOCKED;
+    await this.usersRepository.update(id, { account_status });
+
+    return { ...user, account_status };
+  }
 }
