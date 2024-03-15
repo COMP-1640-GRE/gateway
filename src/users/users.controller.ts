@@ -94,7 +94,7 @@ export class UsersController implements CrudController<User> {
   // @Post('forgot-password')
   // forgotPassword
 
-  @Post('reset-password/:id')
+  @Patch(':id/reset-password')
   @Roles(UserRole.ADMINISTRATOR)
   resetPassword(@Param('id') id: string) {
     return this.service.resetPassword(+id);
