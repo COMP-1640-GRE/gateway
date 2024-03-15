@@ -141,8 +141,17 @@ export class UsersService extends TypeOrmCrudService<User> {
 
   async adminUpdate(id: number, dto: AdminUpdateUserDto) {
     const { role, faculty_id, username, email } = dto;
+
+    const updatingUser = await this.findById(id);
+    if (!updatingUser) {
+      throw new BadRequestException(`User with id ${id} not found`);
+    }
+    if (updatingUser.account_status === AccountStatus.INACTIVE) {
+      throw new BadRequestException(`User with id ${id} is not active`);
+    }
+
     // Check if any user already exists with Promise.race
-    if (username) {
+    if (username && username !== updatingUser.username) {
       const user = await this.findByUsername(username);
 
       if (user) {
@@ -150,7 +159,7 @@ export class UsersService extends TypeOrmCrudService<User> {
       }
     }
 
-    if (email) {
+    if (email && email !== updatingUser.email) {
       const user = await this.findByEmail(email);
 
       if (user) {

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController } from '@nestjsx/crud';
 import {
   JwtPayload,
@@ -36,7 +36,7 @@ import { UsersService } from './users.service';
     cache: 200,
   },
   routes: {
-    only: ['getManyBase'],
+    only: ['getManyBase', 'getOneBase'],
     getManyBase: {
       decorators: [Roles(UserRole.ADMINISTRATOR)],
     },
@@ -77,6 +77,7 @@ export class UsersController implements CrudController<User> {
 
   @Patch(':id')
   @Roles(UserRole.ADMINISTRATOR)
+  @ApiOperation({ summary: 'Admin update a user' })
   adminUpdate(@Param('id') userId: string, @Body() dto: AdminUpdateUserDto) {
     return this.service.adminUpdate(+userId, dto);
   }
