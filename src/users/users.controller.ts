@@ -52,7 +52,7 @@ import { UsersService } from './users.service';
 export class UsersController implements CrudController<User> {
   constructor(public service: UsersService) {}
 
-  @Post('creates')
+  @Post()
   @Roles(UserRole.ADMINISTRATOR)
   async createMultipleUsers(@Body() dto: CreateUsersDto) {
     return await this.service.createUsers(dto);

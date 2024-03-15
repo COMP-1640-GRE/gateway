@@ -1,12 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { FacultiesService } from 'src/faculties/faculties.service';
-import { getList } from 'src/utils/list';
-import { ListRequestDto } from 'src/utils/list.dto';
 import { Repository } from 'typeorm';
 import { CreatePeriodDto } from './dto/period.dto';
-import { PERIOD_ENTITY, Period } from './entities/period.entity';
-import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { Period } from './entities/period.entity';
 
 @Injectable()
 export class PeriodsService extends TypeOrmCrudService<Period> {
@@ -36,10 +34,6 @@ export class PeriodsService extends TypeOrmCrudService<Period> {
     period['faculty'] = faculty;
 
     return await this.periodsRepository.save(period);
-  }
-
-  async findAll(dto: ListRequestDto) {
-    return getList(PERIOD_ENTITY, dto, this.periodsRepository);
   }
 
   async update(id: number, dto: CreatePeriodDto) {

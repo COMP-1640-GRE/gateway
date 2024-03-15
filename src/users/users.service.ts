@@ -1,11 +1,10 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import * as bcrypt from 'bcrypt';
 import { nanoid } from 'nanoid';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
 import { FacultiesService } from 'src/faculties/faculties.service';
-import { getList } from 'src/utils/list';
-import { ListRequestDto } from 'src/utils/list.dto';
 import { Repository } from 'typeorm';
 import {
   AdminUpdateUserDto,
@@ -13,13 +12,8 @@ import {
   CreateUsersDto,
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
-import {
-  AccountStatus,
-  USER_ENTITY,
-  User,
-  UserRole,
-} from './entities/user.entity';
-import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { AccountStatus, User, UserRole } from './entities/user.entity';
+import { isAlphanumeric } from 'class-validator';
 
 @Injectable()
 export class UsersService extends TypeOrmCrudService<User> {
@@ -35,14 +29,14 @@ export class UsersService extends TypeOrmCrudService<User> {
     this.usersRepository.count().then((count) => {
       // if table is empty, create administrator user
       if (count === 0) {
-        const username = 'admin';
+        const usernames = 'admin';
 
         this.createUsers({
-          usernames: [username],
+          usernames,
           role: UserRole.ADMINISTRATOR,
         }).then(() => {
           Logger.log(
-            `'Administrator user created with username: ${username} and password: ${this.defaultPassword}`,
+            `'Administrator user created with username: ${usernames} and password: ${this.defaultPassword}`,
           );
         });
       }
@@ -54,9 +48,21 @@ export class UsersService extends TypeOrmCrudService<User> {
     role,
     faculty_id,
   }: CreateUsersDto): Promise<UsersResponseDto> {
+    const usernamesArray = usernames.replace(/\s/g, '').split(',');
+
+    const invalidUsername = usernamesArray.find(
+      (username) => !isAlphanumeric(username),
+    );
+
+    if (invalidUsername) {
+      throw new BadRequestException(
+        'Usernames must only contain alphanumeric characters. Invalid username: ' +
+          invalidUsername,
+      );
+    }
     // Check if any user already exists with Promise.race
     const user = await Promise.race(
-      usernames.map((username) => this.findByUsername(username)),
+      usernamesArray.map((username) => this.findByUsername(username)),
     );
 
     if (user) {
@@ -86,7 +92,7 @@ export class UsersService extends TypeOrmCrudService<User> {
     const password = await bcrypt.hash(this.defaultPassword, 10);
     // Hash the passwords
     const usersToCreate = await Promise.all(
-      usernames.map(async (username) => ({
+      usernamesArray.map(async (username) => ({
         username,
         role,
         faculty,
@@ -98,10 +104,6 @@ export class UsersService extends TypeOrmCrudService<User> {
     return new UsersResponseDto({
       data: await this.usersRepository.save(usersToCreate),
     });
-  }
-
-  async findAll(dto: ListRequestDto) {
-    return getList(USER_ENTITY, dto, this.usersRepository);
   }
 
   async findById(id: number): Promise<User> {
