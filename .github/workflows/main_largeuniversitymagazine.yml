@@ -21,15 +21,18 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install, build, and test
+      - name: Set up yarn and nestjs cli
         run: |
-          npm install -g @nestjs/cli
           npm install -g yarn
+          npm install -g @nestjs/cli
+
+      - name: install and build
+        run: |
           yarn install
           yarn build
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      - name: Zip artifact for deployment from dist and node_modules
+        run: zip release.zip node_modules dist -r
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
@@ -68,4 +71,5 @@ jobs:
         with:
           app-name: 'largeuniversitymagazine'
           slot-name: 'Production'
+          startup-command: node dist/main
           package: .
