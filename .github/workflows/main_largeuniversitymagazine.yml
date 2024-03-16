@@ -26,8 +26,8 @@ jobs:
           npm install -g @nestjs/cli
           npm install -g yarn
           yarn install
-          yarn build --if-present
-          yarn test --if-present
+          yarn build
+          yarn test
 
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
