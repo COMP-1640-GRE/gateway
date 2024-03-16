@@ -82,7 +82,7 @@ export class UsersController implements CrudController<User> {
     return this.service.adminUpdate(+userId, dto);
   }
 
-  @Post('change-password')
+  @Patch('change-password')
   changePassword(
     @Body() dto: ChangePasswordDto,
     @JwtPayload() { id }: JwtPayloadType,
