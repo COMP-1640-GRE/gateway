@@ -10,7 +10,7 @@ import { Response } from 'express';
 import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
 import { AccountStatus, User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { ActiveAccountDto } from './dto/auth.dto';
+import { ActiveAccountDto, LoginDto } from './dto/auth.dto';
 import { REFRESH_TOKEN_KEY, TOKEN_KEY } from './jwt.strategy';
 
 @Injectable()
@@ -42,12 +42,9 @@ export class AuthService {
     return user;
   }
 
-  async login(
-    res: Response,
-    username: string,
-    password: string,
-    remember = false,
-  ) {
+  async login(res: Response, dto: LoginDto) {
+    const { username, password, remember = false } = dto;
+
     const user = await this.validateUser(username, password);
     const {
       id: id,
@@ -92,13 +89,11 @@ export class AuthService {
       expiresIn: '7d',
     });
 
-    res.cookie(TOKEN_KEY, access_token, { sameSite: 'none', secure: true });
+    const domain = process.env.FRONTEND_DOMAIN || 'localhost';
+    res.cookie(TOKEN_KEY, access_token, { secure: true, domain });
 
     if (remember) {
-      res.cookie(REFRESH_TOKEN_KEY, refresh_token, {
-        sameSite: 'none',
-        secure: true,
-      });
+      res.cookie(REFRESH_TOKEN_KEY, refresh_token, { secure: true, domain });
     }
 
     return user;
@@ -132,6 +127,10 @@ export class AuthService {
 
     await this.usersService.update(user);
 
-    return this.login(res, username, new_password, remember);
+    return this.login(res, {
+      username,
+      password: new_password,
+      remember,
+    });
   }
 }

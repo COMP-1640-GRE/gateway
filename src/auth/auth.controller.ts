@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Patch, Post, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { Public } from 'src/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { ActiveAccountDto, LoginDto } from './dto/auth.dto';
-import { Response } from 'express';
 import { REFRESH_TOKEN_KEY, TOKEN_KEY } from './jwt.strategy';
 
 @ApiTags('Auth')
@@ -15,9 +15,9 @@ export class AuthController {
   @Post('login')
   async login(
     @Res({ passthrough: true }) res: Response,
-    @Body() { username, password, remember }: LoginDto,
+    @Body() dto: LoginDto,
   ) {
-    return this.authService.login(res, username, password, remember);
+    return this.authService.login(res, dto);
   }
 
   @Public()
