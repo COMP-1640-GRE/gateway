@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
 import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
 import { AccountStatus, User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -89,13 +89,17 @@ export class AuthService {
       expiresIn: '7d',
     });
 
-    res.cookie(TOKEN_KEY, access_token, { secure: true, sameSite: 'none' });
+    const cookieOptions: CookieOptions = {
+      secure: true,
+      sameSite: 'lax',
+      httpOnly: true,
+      domain: process.env.FRONTEND_URL || 'localhost',
+    };
+
+    res.cookie(TOKEN_KEY, access_token, cookieOptions);
 
     if (remember) {
-      res.cookie(REFRESH_TOKEN_KEY, refresh_token, {
-        secure: true,
-        sameSite: 'none',
-      });
+      res.cookie(REFRESH_TOKEN_KEY, refresh_token, cookieOptions);
     }
 
     return user;
