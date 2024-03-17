@@ -89,12 +89,12 @@ export class AuthService {
       expiresIn: '7d',
     });
 
-    res.cookie(TOKEN_KEY, access_token, { secure: true, httpOnly: true });
+    res.cookie(TOKEN_KEY, access_token, { secure: true, sameSite: 'none' });
 
     if (remember) {
       res.cookie(REFRESH_TOKEN_KEY, refresh_token, {
         secure: true,
-        httpOnly: true,
+        sameSite: 'none',
       });
     }
 
