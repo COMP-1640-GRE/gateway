@@ -92,13 +92,10 @@ export class AuthService {
       expiresIn: '7d',
     });
 
-    res.cookie(TOKEN_KEY, access_token, { sameSite: 'none', secure: true });
+    res.cookie(TOKEN_KEY, access_token, { secure: true });
 
     if (remember) {
-      res.cookie(REFRESH_TOKEN_KEY, refresh_token, {
-        sameSite: 'none',
-        secure: true,
-      });
+      res.cookie(REFRESH_TOKEN_KEY, refresh_token, { secure: true });
     }
 
     return user;
