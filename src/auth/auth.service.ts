@@ -89,11 +89,13 @@ export class AuthService {
       expiresIn: '7d',
     });
 
-    const domain = process.env.FRONTEND_DOMAIN || 'localhost';
-    res.cookie(TOKEN_KEY, access_token, { secure: true, domain });
+    res.cookie(TOKEN_KEY, access_token, { secure: true, httpOnly: true });
 
     if (remember) {
-      res.cookie(REFRESH_TOKEN_KEY, refresh_token, { secure: true, domain });
+      res.cookie(REFRESH_TOKEN_KEY, refresh_token, {
+        secure: true,
+        httpOnly: true,
+      });
     }
 
     return user;

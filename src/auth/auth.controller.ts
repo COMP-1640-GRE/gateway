@@ -36,4 +36,11 @@ export class AuthController {
 
     return { message: 'Logged out' };
   }
+
+  @Get('introspect')
+  introspect() {
+    return {
+      authenticated: true,
+    };
+  }
 }
