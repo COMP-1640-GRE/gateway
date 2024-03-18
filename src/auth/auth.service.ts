@@ -90,7 +90,10 @@ export class AuthService {
     });
 
     const cookieOptions: CookieOptions = {
-      domain: process.env.FRONTEND_URL || 'localhost',
+      // secure: true,
+      sameSite: 'none',
+      // httpOnly: true,
+      // domain: process.env.FRONTEND_URL || 'localhost',
     };
 
     res.cookie(TOKEN_KEY, access_token, cookieOptions);
