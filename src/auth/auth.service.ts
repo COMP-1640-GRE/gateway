@@ -90,7 +90,7 @@ export class AuthService {
     });
 
     const cookieOptions: CookieOptions = {
-      // secure: true,
+      secure: true,
       sameSite: 'none',
       // httpOnly: true,
       // domain: process.env.FRONTEND_URL || 'localhost',
