@@ -3,22 +3,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { FacultiesService } from 'src/faculties/faculties.service';
 import { Repository } from 'typeorm';
-import { CreatePeriodDto } from './dto/period.dto';
-import { Period } from './entities/period.entity';
+import { CreateSemesterDto } from './dto/semester.dto';
+import { Semester } from './entities/semester.entity';
 
 @Injectable()
-export class PeriodsService extends TypeOrmCrudService<Period> {
+export class SemestersService extends TypeOrmCrudService<Semester> {
   constructor(
-    @InjectRepository(Period) private periodsRepository: Repository<Period>,
+    @InjectRepository(Semester)
+    private semestersRepository: Repository<Semester>,
     private facultiesService: FacultiesService,
   ) {
-    super(periodsRepository);
+    super(semestersRepository);
   }
 
-  async create(dto: CreatePeriodDto) {
-    const { faculty_id, ...period } = dto;
+  async create(dto: CreateSemesterDto) {
+    const { faculty_id, ...semester } = dto;
 
-    const { start_date, end_date } = period;
+    const { start_date, end_date } = semester;
 
     // make sure that start date is before end date
     if (start_date >= end_date) {
@@ -31,13 +32,13 @@ export class PeriodsService extends TypeOrmCrudService<Period> {
       throw new BadRequestException(`Faculty with id ${faculty_id} not found`);
     }
 
-    period['faculty'] = faculty;
+    semester['faculty'] = faculty;
 
-    return await this.periodsRepository.save(period);
+    return await this.semestersRepository.save(semester);
   }
 
-  async update(id: number, dto: CreatePeriodDto) {
-    const { faculty_id, ...period } = dto;
+  async update(id: number, dto: CreateSemesterDto) {
+    const { faculty_id, ...semester } = dto;
 
     const faculty = await this.facultiesService.findById(faculty_id);
 
@@ -45,12 +46,12 @@ export class PeriodsService extends TypeOrmCrudService<Period> {
       throw new BadRequestException(`Faculty with id ${faculty_id} not found`);
     }
 
-    period['faculty'] = faculty;
+    semester['faculty'] = faculty;
 
-    return await this.periodsRepository.update(id, period);
+    return await this.semestersRepository.update(id, semester);
   }
 
   remove(id: number) {
-    return this.periodsRepository.delete(id);
+    return this.semestersRepository.delete(id);
   }
 }

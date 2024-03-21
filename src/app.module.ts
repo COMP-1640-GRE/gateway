@@ -10,7 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/jwt.guard';
 import { RolesGuard } from './auth/roles.guard';
 import { FacultiesModule } from './faculties/faculties.module';
-import { PeriodsModule } from './periods/periods.module';
+import { SemestersModule } from './semesters/semesters.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -36,7 +36,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     UsersModule,
     FacultiesModule,
-    PeriodsModule,
+    SemestersModule,
   ],
   controllers: [],
   providers: [

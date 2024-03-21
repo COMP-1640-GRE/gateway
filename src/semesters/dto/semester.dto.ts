@@ -8,7 +8,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class CreatePeriodDto {
+export class CreateSemesterDto {
   @ApiProperty({
     example: '2024-2025',
   })
@@ -26,15 +26,11 @@ export class CreatePeriodDto {
   @MaxLength(256)
   description: string;
 
-  @ApiProperty({
-    example: '2024-09-01',
-  })
+  @ApiProperty({ example: '2024-09-01' })
   @IsDateString()
   start_date: Date;
 
-  @ApiProperty({
-    example: '2024-12-31',
-  })
+  @ApiProperty({ example: '2024-12-31' })
   @IsDateString()
   end_date: Date;
 

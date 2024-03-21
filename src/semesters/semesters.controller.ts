@@ -3,19 +3,19 @@ import { ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController } from '@nestjsx/crud';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
-import { CreatePeriodDto } from './dto/period.dto';
-import { Period } from './entities/period.entity';
-import { PeriodsService } from './periods.service';
+import { CreateSemesterDto } from './dto/semester.dto';
+import { Semester } from './entities/semester.entity';
+import { SemestersService } from './semesters.service';
 
-@ApiTags('Periods')
-@Controller('periods')
+@ApiTags('Semesters')
+@Controller('semesters')
 @Crud({
   model: {
-    type: Period,
+    type: Semester,
   },
   dto: {
-    create: CreatePeriodDto,
-    update: CreatePeriodDto,
+    create: CreateSemesterDto,
+    update: CreateSemesterDto,
   },
   query: {
     limit: 100,
@@ -42,18 +42,18 @@ import { PeriodsService } from './periods.service';
     },
   },
 })
-export class PeriodsController implements CrudController<Period> {
-  constructor(public service: PeriodsService) {}
+export class SemestersController implements CrudController<Semester> {
+  constructor(public service: SemestersService) {}
 
   @Post()
   @Roles(UserRole.ADMINISTRATOR)
-  create(@Body() createPeriodDto: CreatePeriodDto) {
-    return this.service.create(createPeriodDto);
+  create(@Body() dto: CreateSemesterDto) {
+    return this.service.create(dto);
   }
 
   @Patch(':id')
   @Roles(UserRole.ADMINISTRATOR)
-  update(@Param('id') id: string, @Body() updatePeriodDto: CreatePeriodDto) {
-    return this.service.update(+id, updatePeriodDto);
+  update(@Param('id') id: string, @Body() dto: CreateSemesterDto) {
+    return this.service.update(+id, dto);
   }
 }

@@ -1,4 +1,4 @@
-import { Period } from 'src/periods/entities/period.entity';
+import { Semester } from 'src/semesters/entities/semester.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
   Column,
@@ -32,6 +32,6 @@ export class Faculty {
   @JoinColumn({ name: 'id', referencedColumnName: 'faculty_id' })
   users: User[];
 
-  @OneToMany(() => Period, (period) => period.faculty)
-  periods: Period[];
+  @OneToMany(() => Semester, (semester) => semester.faculty)
+  semesters: Semester[];
 }

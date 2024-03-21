@@ -9,10 +9,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export const PERIOD_ENTITY = 'period';
+export const SEMESTER_ENTITY = 'semester';
 
-@Entity({ name: PERIOD_ENTITY })
-export class Period {
+@Entity({ name: SEMESTER_ENTITY })
+export class Semester {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -35,7 +35,7 @@ export class Period {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => Faculty, (faculty) => faculty.periods, {
+  @ManyToOne(() => Faculty, (faculty) => faculty.semesters, {
     eager: true,
     nullable: false,
     onDelete: 'CASCADE',
