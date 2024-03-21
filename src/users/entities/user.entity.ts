@@ -1,15 +1,8 @@
 import { Exclude } from 'class-transformer';
+import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { BaseEntity } from 'src/utils/entity/base-entity';
+import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 
 export enum UserRole {
   GUEST = 'guest',
@@ -27,10 +20,7 @@ export enum AccountStatus {
 export const USER_ENTITY = 'user';
 
 @Entity({ name: USER_ENTITY })
-export class User {
-  @PrimaryGeneratedColumn()
-  id!: number;
-
+export class User extends BaseEntity {
   @Column({ unique: true })
   @Index()
   username: string;
@@ -67,24 +57,18 @@ export class User {
   })
   account_status: AccountStatus;
 
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
-
   @ManyToOne(() => Faculty, (faculty) => faculty.users, {
     eager: true,
     nullable: true,
     onDelete: 'SET NULL',
   })
-  @JoinColumn({
-    name: 'faculty_id',
-    referencedColumnName: 'id',
-  })
   faculty: Faculty;
 
+  @OneToMany(() => Contribution, (contribution) => contribution.student, {})
+  contributions: Contribution[];
+
   constructor(partial: Partial<User>) {
+    super();
     Object.assign(this, partial);
   }
 }

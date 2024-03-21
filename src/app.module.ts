@@ -12,6 +12,7 @@ import { RolesGuard } from './auth/roles.guard';
 import { FacultiesModule } from './faculties/faculties.module';
 import { SemestersModule } from './semesters/semesters.module';
 import { UsersModule } from './users/users.module';
+import { ContributionsModule } from './contributions/contributions.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     FacultiesModule,
     SemestersModule,
+    ContributionsModule,
   ],
   controllers: [],
   providers: [

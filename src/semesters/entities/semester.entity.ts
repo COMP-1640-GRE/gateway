@@ -1,18 +1,19 @@
+import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
+import { BaseEntity } from 'src/utils/entity/base-entity';
 import {
   Column,
-  CreateDateColumn,
   Entity,
   Index,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
 export const SEMESTER_ENTITY = 'semester';
 
 @Entity({ name: SEMESTER_ENTITY })
-export class Semester {
+export class Semester extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -29,16 +30,13 @@ export class Semester {
   @Column()
   end_date: Date;
 
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn()
-  updated_at: Date;
-
   @ManyToOne(() => Faculty, (faculty) => faculty.semesters, {
     eager: true,
     nullable: false,
     onDelete: 'CASCADE',
   })
   faculty: Faculty;
+
+  @OneToMany(() => Contribution, (contribution) => contribution.semester, {})
+  contributions: Contribution[];
 }
