@@ -34,10 +34,7 @@ export class CreateSemesterDto {
   @IsDateString()
   end_date: Date;
 
-  @ApiProperty({
-    example: 1,
-    required: false,
-  })
+  @ApiProperty({ example: 1 })
   @IsPositive()
   faculty_id: number;
 }

@@ -3,7 +3,7 @@ import { CreateContributionDto } from './dto/contribution.dto';
 
 @Injectable()
 export class ContributionsService {
-  create(createContributionDto: CreateContributionDto) {
+  create(dto: CreateContributionDto, attachments: Array<Express.Multer.File>) {
     return 'This action adds a new contribution';
   }
 
