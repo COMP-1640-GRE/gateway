@@ -13,6 +13,7 @@ import { FacultiesModule } from './faculties/faculties.module';
 import { SemestersModule } from './semesters/semesters.module';
 import { UsersModule } from './users/users.module';
 import { ContributionsModule } from './contributions/contributions.module';
+import { AttachmentsModule } from './attachments/attachments.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { ContributionsModule } from './contributions/contributions.module';
     FacultiesModule,
     SemestersModule,
     ContributionsModule,
+    AttachmentsModule,
   ],
   controllers: [],
   providers: [

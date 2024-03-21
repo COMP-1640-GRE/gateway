@@ -1,7 +1,8 @@
+import { Attachment } from 'src/attachments/entities/attachment.entity';
 import { Semester } from 'src/semesters/entities/semester.entity';
 import { User } from 'src/users/entities/user.entity';
 import { BaseEntity } from 'src/utils/entity/base-entity';
-import { Column, Entity, Index, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 
 export const CONTRIBUTION_ENTITY = 'contribution';
 
@@ -50,4 +51,7 @@ export class Contribution extends BaseEntity {
     onDelete: 'CASCADE',
   })
   semester: Semester;
+
+  @OneToMany(() => Attachment, (attachment) => attachment.contribution)
+  attachments: Attachment[];
 }
