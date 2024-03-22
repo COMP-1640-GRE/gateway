@@ -1,5 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { CreateContributionDto } from './dto/contribution.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  CreateContributionDto,
+  UpdateContributionDto,
+} from './dto/contribution.dto';
 import { AttachmentsService } from 'src/attachments/attachments.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Contribution } from './entities/contribution.entity';
@@ -14,15 +17,22 @@ export class ContributionsService {
   ) {}
 
   async create(
+    userId: number,
     dto: CreateContributionDto,
     attachments: Array<Express.Multer.File>,
   ) {
-    const attachmentsDto = this.attachmentsService.validate(attachments);
+    const attachmentsDto = this.attachmentsService.validate(
+      userId,
+      attachments,
+    );
 
-    const contribution = await this.contributionsRepository.save(dto);
+    const contribution = await this.contributionsRepository.save({
+      ...dto,
+      student: { id: userId },
+    });
 
     try {
-      await this.attachmentsService.create(contribution, attachmentsDto);
+      await this.attachmentsService.creates(contribution, attachmentsDto);
     } catch (error) {
       await this.contributionsRepository.remove(contribution);
       throw error;
@@ -31,19 +41,48 @@ export class ContributionsService {
     return contribution;
   }
 
-  findAll() {
-    return `This action returns all contributions`;
-  }
-
   findOne(id: number) {
-    return `This action returns a #${id} contribution`;
+    return this.contributionsRepository.findOne(
+      { id },
+      {
+        relations: ['attachments'],
+      },
+    );
   }
 
-  update(id: number, updateContributionDto: CreateContributionDto) {
-    return `This action updates a #${id} contribution`;
+  async update(
+    id: number,
+    userId: number,
+    { to_delete, ...dto }: UpdateContributionDto,
+    attachments: Array<Express.Multer.File>,
+  ) {
+    const attachmentsDto = this.attachmentsService.validate(
+      userId,
+      attachments,
+    );
+
+    await this.attachmentsService.deletes(to_delete);
+
+    await this.attachmentsService.creates(
+      new Contribution({ id }),
+      attachmentsDto,
+    );
+
+    const contribution = await this.contributionsRepository.update(id, dto);
+
+    return contribution;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} contribution`;
+  async remove(id: number) {
+    const contribution = await this.contributionsRepository.findOne({ id });
+
+    if (!contribution) {
+      throw new NotFoundException(`Contribution with id ${id} not found`);
+    }
+
+    const attachments = contribution.attachments.map(({ path }) => path);
+    await this.attachmentsService.deletes(attachments);
+
+    return this.contributionsRepository.remove(contribution);
   }
 }

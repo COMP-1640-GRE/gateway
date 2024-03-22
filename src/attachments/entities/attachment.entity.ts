@@ -21,7 +21,6 @@ export class Attachment extends BaseEntity {
   type: AttachmentType;
 
   @ManyToOne(() => Contribution, (contribution) => contribution.attachments, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   contribution: Contribution;

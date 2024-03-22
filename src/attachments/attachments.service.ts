@@ -18,7 +18,10 @@ export class AttachmentsService {
     private attachmentsRepository: Repository<Attachment>,
   ) {}
 
-  validate(attachments: Array<Express.Multer.File>): CreateAttachmentDto[] {
+  validate(
+    userId: number,
+    attachments: Array<Express.Multer.File>,
+  ): CreateAttachmentDto[] {
     if (!attachments || attachments.length === 0) {
       throw new BadRequestException('Attachments are required');
     }
@@ -39,11 +42,12 @@ export class AttachmentsService {
       return {
         type,
         file,
+        userId,
       };
     });
   }
 
-  async create(contribution: Contribution, dto: CreateAttachmentDto[]) {
+  async creates(contribution: Contribution, dto: CreateAttachmentDto[]) {
     const uploadedAttachments = await Promise.all(dto.map(this.upload));
 
     return this.attachmentsRepository.save(
@@ -54,11 +58,16 @@ export class AttachmentsService {
     );
   }
 
-  upload({ file, type }: CreateAttachmentDto) {
+  async upload({ file, type, userId }: CreateAttachmentDto) {
     // TODO: call gRPC service
     return {
       path: '',
       type,
     };
+  }
+
+  async deletes(to_delete: string[]) {
+    // TODO: call gRPC service
+    return;
   }
 }

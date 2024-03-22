@@ -13,13 +13,46 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Crud } from '@nestjsx/crud';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
 import { ContributionsService } from './contributions.service';
-import { CreateContributionDto } from './dto/contribution.dto';
+import {
+  CreateContributionDto,
+  UpdateContributionDto,
+} from './dto/contribution.dto';
+import { Contribution } from './entities/contribution.entity';
+import {
+  JwtPayload,
+  JwtPayloadType,
+} from 'src/decorators/jwt-payload.decorator';
 
 @ApiTags('Contributions')
 @Controller('contributions')
+@Crud({
+  model: {
+    type: Contribution,
+  },
+  query: {
+    limit: 100,
+    join: {
+      faculty: {
+        eager: true,
+      },
+    },
+    cache: 200,
+  },
+  routes: {
+    only: ['getManyBase'],
+  },
+  params: {
+    id: {
+      type: 'number',
+      primary: true,
+      field: 'id',
+    },
+  },
+})
 export class ContributionsController {
   constructor(private readonly contributionsService: ContributionsService) {}
 
@@ -36,26 +69,30 @@ export class ContributionsController {
       }),
     )
     attachments: Array<Express.Multer.File>,
+    @JwtPayload() { id: userId }: JwtPayloadType,
   ) {
-    return this.contributionsService.create(dto, attachments);
-  }
-
-  @Get()
-  findAll() {
-    return this.contributionsService.findAll();
+    return this.contributionsService.create(userId, dto, attachments);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
+    // TODO: handle view_count
     return this.contributionsService.findOne(+id);
   }
 
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateContributionDto: CreateContributionDto,
+    @Body() dto: UpdateContributionDto,
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 15 })],
+      }),
+    )
+    attachments: Array<Express.Multer.File>,
+    @JwtPayload() { id: userId }: JwtPayloadType,
   ) {
-    return this.contributionsService.update(+id, updateContributionDto);
+    return this.contributionsService.update(+id, userId, dto, attachments);
   }
 
   @Delete(':id')

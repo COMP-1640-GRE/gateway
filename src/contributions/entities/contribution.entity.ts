@@ -54,4 +54,9 @@ export class Contribution extends BaseEntity {
 
   @OneToMany(() => Attachment, (attachment) => attachment.contribution)
   attachments: Attachment[];
+
+  constructor(partial: Partial<Contribution>) {
+    super();
+    Object.assign(this, partial);
+  }
 }

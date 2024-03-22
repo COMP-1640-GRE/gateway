@@ -36,3 +36,9 @@ export class CreateContributionDto {
   @ApiProperty({ type: 'array', items: { type: 'string', format: 'binary' } })
   attachments: Express.Multer.File[];
 }
+
+export class UpdateContributionDto extends CreateContributionDto {
+  @ApiProperty({ isArray: true, example: ['1', '2'] })
+  @IsString({ each: true })
+  to_delete: string[];
+}
