@@ -81,6 +81,10 @@ export class ContributionsController {
   }
 
   @Patch(':id')
+  @Roles(UserRole.STUDENT)
+  @ApiBody({ type: CreateContributionDto })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FilesInterceptor('attachments'))
   update(
     @Param('id') id: string,
     @Body() dto: UpdateContributionDto,
@@ -96,7 +100,11 @@ export class ContributionsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.contributionsService.remove(+id);
+  @Roles(UserRole.STUDENT)
+  remove(
+    @Param('id') id: string,
+    @JwtPayload() { id: userId }: JwtPayloadType,
+  ) {
+    return this.contributionsService.remove(+id, userId);
   }
 }

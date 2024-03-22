@@ -1,5 +1,10 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cache } from 'cache-manager';
 import { AttachmentsService } from 'src/attachments/attachments.service';
@@ -82,6 +87,19 @@ export class ContributionsService {
       userId,
       attachments,
     );
+    const contribution = await this.contributionsRepository.findOne(id, {
+      relations: ['student'],
+    });
+
+    if (!contribution) {
+      throw new NotFoundException(`Contribution with id ${id} not found`);
+    }
+
+    if (contribution.student.id !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to update this contribution',
+      );
+    }
 
     await this.attachmentsService.deletes(to_delete);
 
@@ -90,16 +108,22 @@ export class ContributionsService {
       attachmentsDto,
     );
 
-    const contribution = await this.contributionsRepository.update(id, dto);
-
-    return contribution;
+    return await this.contributionsRepository.update(id, dto);
   }
 
-  async remove(id: number) {
-    const contribution = await this.contributionsRepository.findOne({ id });
+  async remove(id: number, userId: number) {
+    const contribution = await this.contributionsRepository.findOne(id, {
+      relations: ['student'],
+    });
 
     if (!contribution) {
       throw new NotFoundException(`Contribution with id ${id} not found`);
+    }
+
+    if (contribution.student.id !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this contribution',
+      );
     }
 
     const attachments = contribution.attachments.map(({ path }) => path);
