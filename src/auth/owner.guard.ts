@@ -36,7 +36,12 @@ export class OwnerGuard implements CanActivate {
     if (!user?.id || !id) {
       return false;
     }
-    const { relation, table, self } = owner;
+    const { relation, table, self, excludedRoles } = owner;
+
+    if (excludedRoles?.includes(user.role)) {
+      return true;
+    }
+
     const repository = this.manager.getRepository(table);
 
     const entity = await repository

@@ -125,8 +125,8 @@ export class ContributionsController implements CrudController<Contribution> {
   }
 
   @Delete(':id')
-  @Roles(UserRole.STUDENT)
-  @Owner(CONTRIBUTION_ENTITY, 'student_id')
+  @Roles(UserRole.STUDENT, UserRole.ADMINISTRATOR)
+  @Owner(CONTRIBUTION_ENTITY, 'student_id', false, [UserRole.ADMINISTRATOR])
   remove(@Param('id') id: string) {
     return this.service.remove(+id);
   }
