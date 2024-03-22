@@ -13,9 +13,22 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { Crud, CrudController } from '@nestjsx/crud';
+import {
+  Crud,
+  CrudController,
+  CrudRequest,
+  Override,
+  ParsedRequest,
+} from '@nestjsx/crud';
+import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
+import {
+  JwtPayload,
+  JwtPayloadType,
+} from 'src/decorators/jwt-payload.decorator';
+import { Owner } from 'src/decorators/owner.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
+import { mapContributions } from 'src/utils/contribution';
 import { ContributionsService } from './contributions.service';
 import {
   CreateContributionDto,
@@ -26,12 +39,6 @@ import {
   CONTRIBUTION_ENTITY,
   Contribution,
 } from './entities/contribution.entity';
-import {
-  JwtPayload,
-  JwtPayloadType,
-} from 'src/decorators/jwt-payload.decorator';
-import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
-import { Owner } from 'src/decorators/owner.decorator';
 
 @ApiTags('Contributions')
 @Controller('contributions')
@@ -41,12 +48,12 @@ import { Owner } from 'src/decorators/owner.decorator';
   },
   query: {
     limit: 100,
+    alwaysPaginate: true,
     join: {
       attachments: {
         eager: true,
       },
       student: {
-        // TODO: check if is_anonymous
         eager: true,
       },
       semester: {
@@ -71,7 +78,9 @@ import { Owner } from 'src/decorators/owner.decorator';
 })
 export class ContributionsController implements CrudController<Contribution> {
   constructor(public service: ContributionsService) {}
-
+  get base(): CrudController<Contribution> {
+    return this;
+  }
   @Post()
   @Roles(UserRole.STUDENT)
   @ApiBody({ type: CreateContributionDto })
@@ -137,5 +146,17 @@ export class ContributionsController implements CrudController<Contribution> {
   @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
   evaluate(@Param('id') id: string, @Body() dto: EvaluateDto) {
     return this.service.evaluate(+id, dto);
+  }
+
+  @Override('getManyBase')
+  async getMany(@ParsedRequest() req: CrudRequest) {
+    const res = await this.base.getManyBase(req);
+
+    if (Array.isArray(res)) {
+      return mapContributions(res);
+    }
+
+    res.data = mapContributions(res.data);
+    return res;
   }
 }

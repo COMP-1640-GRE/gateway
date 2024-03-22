@@ -64,6 +64,10 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
       },
     );
 
+    if (!contribution) {
+      throw new NotFoundException(`Contribution with id ${id} not found`);
+    }
+
     const key = `contribution-${id}-${fingerprint}`;
 
     const cache = await this.cacheManager.get<boolean>(key);
@@ -76,8 +80,8 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
       await this.contributionsRepository.save(contribution);
     }
 
-    if (!contribution) {
-      throw new NotFoundException(`Contribution with id ${id} not found`);
+    if (contribution.is_anonymous) {
+      contribution.student = undefined;
     }
 
     return contribution;
