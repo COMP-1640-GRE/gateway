@@ -14,6 +14,7 @@ import { SemestersModule } from './semesters/semesters.module';
 import { UsersModule } from './users/users.module';
 import { ContributionsModule } from './contributions/contributions.module';
 import { AttachmentsModule } from './attachments/attachments.module';
+import { NestjsFingerprintModule } from 'nestjs-fingerprint';
 
 @Module({
   imports: [
@@ -35,6 +36,9 @@ import { AttachmentsModule } from './attachments/attachments.module';
       synchronize: true,
       namingStrategy: new SnakeNamingStrategy(),
     }),
+    NestjsFingerprintModule.forRoot({
+      params: ['headers', 'userAgent', 'ipAddress'],
+    }),
     AuthModule,
     UsersModule,
     FacultiesModule,
@@ -46,7 +50,6 @@ import { AttachmentsModule } from './attachments/attachments.module';
   providers: [
     {
       provide: APP_GUARD,
-      // useClass: AuthGuard,
       useClass: JwtGuard,
     },
     {

@@ -26,6 +26,7 @@ import {
   JwtPayload,
   JwtPayloadType,
 } from 'src/decorators/jwt-payload.decorator';
+import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
 
 @ApiTags('Contributions')
 @Controller('contributions')
@@ -75,9 +76,8 @@ export class ContributionsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    // TODO: handle view_count
-    return this.contributionsService.findOne(+id);
+  findOne(@Param('id') id: string, @Fingerprint() fp: IFingerprint) {
+    return this.contributionsService.findOne(+id, fp.id);
   }
 
   @Patch(':id')

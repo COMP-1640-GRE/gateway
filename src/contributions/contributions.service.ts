@@ -1,12 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Cache } from 'cache-manager';
+import { AttachmentsService } from 'src/attachments/attachments.service';
+import { Repository } from 'typeorm';
 import {
   CreateContributionDto,
   UpdateContributionDto,
 } from './dto/contribution.dto';
-import { AttachmentsService } from 'src/attachments/attachments.service';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Contribution } from './entities/contribution.entity';
-import { Repository } from 'typeorm';
+
+const VIEW_CACHE_TIME = 5 * 60 * 1000;
 
 @Injectable()
 export class ContributionsService {
@@ -14,6 +18,8 @@ export class ContributionsService {
     @InjectRepository(Contribution)
     private contributionsRepository: Repository<Contribution>,
     private readonly attachmentsService: AttachmentsService,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
   ) {}
 
   async create(
@@ -41,13 +47,29 @@ export class ContributionsService {
     return contribution;
   }
 
-  findOne(id: number) {
-    return this.contributionsRepository.findOne(
+  async findOne(id: number, fingerprint: string) {
+    const contribution = await this.contributionsRepository.findOne(
       { id },
-      {
-        relations: ['attachments'],
-      },
+      { relations: ['attachments'] },
     );
+
+    const key = `contribution-${id}-${fingerprint}`;
+
+    const cache = await this.cacheManager.get<boolean>(key);
+
+    if (!cache) {
+      await this.cacheManager.set(key, true, VIEW_CACHE_TIME);
+
+      contribution.view_count++;
+
+      await this.contributionsRepository.save(contribution);
+    }
+
+    if (!contribution) {
+      throw new NotFoundException(`Contribution with id ${id} not found`);
+    }
+
+    return contribution;
   }
 
   async update(
