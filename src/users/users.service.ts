@@ -21,7 +21,7 @@ export class UsersService extends TypeOrmCrudService<User> {
 
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    public usersRepository: Repository<User>,
     private facultiesService: FacultiesService,
   ) {
     super(usersRepository);

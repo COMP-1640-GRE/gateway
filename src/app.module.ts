@@ -15,6 +15,8 @@ import { UsersModule } from './users/users.module';
 import { ContributionsModule } from './contributions/contributions.module';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { NestjsFingerprintModule } from 'nestjs-fingerprint';
+import { ReviewsModule } from './reviews/reviews.module';
+import { OwnerGuard } from './auth/owner.guard';
 
 @Module({
   imports: [
@@ -45,6 +47,7 @@ import { NestjsFingerprintModule } from 'nestjs-fingerprint';
     SemestersModule,
     ContributionsModule,
     AttachmentsModule,
+    ReviewsModule,
   ],
   controllers: [],
   providers: [
@@ -55,6 +58,10 @@ import { NestjsFingerprintModule } from 'nestjs-fingerprint';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: OwnerGuard,
     },
     {
       provide: APP_INTERCEPTOR,

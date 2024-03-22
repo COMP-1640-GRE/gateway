@@ -18,17 +18,12 @@ export class AttachmentsService {
     private attachmentsRepository: Repository<Attachment>,
   ) {}
 
-  validate(
-    userId: number,
-    attachments: Array<Express.Multer.File>,
-  ): CreateAttachmentDto[] {
+  validate(attachments: Array<Express.Multer.File>): CreateAttachmentDto[] {
     if (!attachments || attachments.length === 0) {
       throw new BadRequestException('Attachments are required');
     }
 
     return attachments.map((file) => {
-      console.log(file.mimetype);
-
       const fileType = file.mimetype.split('/')[1];
       if (!ACCEPTED_FILE_TYPES.includes(fileType.toLowerCase())) {
         throw new BadRequestException('Invalid file type: ' + fileType);
@@ -42,13 +37,16 @@ export class AttachmentsService {
       return {
         type,
         file,
-        userId,
       };
     });
   }
 
   async creates(contribution: Contribution, dto: CreateAttachmentDto[]) {
-    const uploadedAttachments = await Promise.all(dto.map(this.upload));
+    const uploadedAttachments = await Promise.all(
+      dto.map(({ file, type }) =>
+        this.upload({ file, type, contributionId: contribution.id }),
+      ),
+    );
 
     return this.attachmentsRepository.save(
       uploadedAttachments.map((attachment) => ({
@@ -58,8 +56,13 @@ export class AttachmentsService {
     );
   }
 
-  async upload({ file, type, userId }: CreateAttachmentDto) {
+  async upload({
+    file,
+    type,
+    contributionId,
+  }: CreateAttachmentDto & { contributionId: number }) {
     // TODO: call gRPC service
+    // upload to folder: `attachments/&{contributionId}`
     return {
       path: '',
       type,

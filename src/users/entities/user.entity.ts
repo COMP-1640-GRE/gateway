@@ -1,6 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
+import { Review } from 'src/reviews/entities/review.entity';
 import { BaseEntity } from 'src/utils/entity/base-entity';
 import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 
@@ -66,6 +67,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Contribution, (contribution) => contribution.student, {})
   contributions: Contribution[];
+
+  @OneToMany(() => Review, (review) => review.reviewer, {})
+  reviews: Review[];
 
   constructor(partial: Partial<User>) {
     super();

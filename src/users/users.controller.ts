@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController } from '@nestjsx/crud';
 import {
   JwtPayload,
   JwtPayloadType,
 } from 'src/decorators/jwt-payload.decorator';
+import { Owner } from 'src/decorators/owner.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 import {
   AdminUpdateUserDto,
@@ -12,7 +13,7 @@ import {
   CreateUsersDto,
   UpdateUserDto,
 } from './dto/user.dto';
-import { User, UserRole } from './entities/user.entity';
+import { USER_ENTITY, User, UserRole } from './entities/user.entity';
 import { UsersService } from './users.service';
 
 @ApiTags('Users')
@@ -36,9 +37,15 @@ import { UsersService } from './users.service';
     cache: 200,
   },
   routes: {
-    only: ['getManyBase', 'getOneBase'],
+    only: ['getManyBase', 'getOneBase', 'deleteOneBase'],
     getManyBase: {
       decorators: [Roles(UserRole.ADMINISTRATOR)],
+    },
+    deleteOneBase: {
+      decorators: [
+        Roles(UserRole.ADMINISTRATOR),
+        Owner(USER_ENTITY, 'id', true),
+      ],
     },
   },
   params: {
@@ -60,7 +67,7 @@ export class UsersController implements CrudController<User> {
 
   @Patch()
   update(@Body() dto: UpdateUserDto, @JwtPayload() { id }: JwtPayloadType) {
-    return this.service.update({ id: id, ...dto });
+    return this.service.update({ id, ...dto });
   }
 
   // TODO: find one user that can list all it's paginated contributions.
@@ -68,12 +75,6 @@ export class UsersController implements CrudController<User> {
   // findByUsername(@Param('id') username: string) {
   //   return this.userService.findOneByUsername(username);
   // }
-
-  @Delete(':id')
-  @Roles(UserRole.ADMINISTRATOR)
-  remove(@Param('id') userId: string, @JwtPayload() { id }: JwtPayloadType) {
-    return this.service.remove(+id, +userId);
-  }
 
   @Patch(':id')
   @Roles(UserRole.ADMINISTRATOR)
