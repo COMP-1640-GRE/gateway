@@ -2,12 +2,14 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsEnum,
   IsOptional,
   IsPositive,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ContributionEvaluate } from '../entities/contribution.entity';
 
 export class CreateContributionDto {
   @ApiProperty({ example: 'My contribution' })
@@ -41,4 +43,13 @@ export class UpdateContributionDto extends CreateContributionDto {
   @ApiProperty({ isArray: true, example: ['1', '2'] })
   @IsString({ each: true })
   to_delete: string[];
+}
+
+export class EvaluateDto {
+  @ApiProperty({
+    example: ContributionEvaluate.NORMAL,
+    enum: ContributionEvaluate,
+  })
+  @IsEnum(ContributionEvaluate)
+  evaluation: ContributionEvaluate;
 }

@@ -7,6 +7,7 @@ import { AttachmentsService } from 'src/attachments/attachments.service';
 import { Repository } from 'typeorm';
 import {
   CreateContributionDto,
+  EvaluateDto,
   UpdateContributionDto,
 } from './dto/contribution.dto';
 import { Contribution } from './entities/contribution.entity';
@@ -119,5 +120,38 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     await this.attachmentsService.deletes(attachments);
 
     return this.contributionsRepository.remove(contribution);
+  }
+
+  async approve(id: number) {
+    const contribution = await this.contributionsRepository.findOne(id);
+
+    if (!contribution) {
+      throw new NotFoundException(`Contribution with id ${id} not found`);
+    }
+
+    return await this.contributionsRepository.update(id, {
+      approved: !contribution.approved,
+    });
+  }
+  async select(id: number) {
+    const contribution = await this.contributionsRepository.findOne(id);
+
+    if (!contribution) {
+      throw new NotFoundException(`Contribution with id ${id} not found`);
+    }
+
+    return await this.contributionsRepository.update(id, {
+      selected: !contribution.selected,
+    });
+  }
+
+  async evaluate(id: number, { evaluation }: EvaluateDto) {
+    const contribution = await this.contributionsRepository.findOne(id);
+
+    if (!contribution) {
+      throw new NotFoundException(`Contribution with id ${id} not found`);
+    }
+
+    return await this.contributionsRepository.update(id, { evaluation });
   }
 }

@@ -22,7 +22,7 @@ export class CreateUsersDto {
   @ApiProperty({ example: 'john,jane' })
   usernames: string;
 
-  @ApiProperty({ example: 'student' })
+  @ApiProperty({ example: 'student', enum: UserRole })
   @IsEnum(UserRole)
   role: UserRole;
 
@@ -78,7 +78,7 @@ export class AdminUpdateUserDto extends UpdateUserDto {
   @ApiProperty({ example: 'john', required: false })
   username: string;
 
-  @ApiProperty({ example: 'student' })
+  @ApiProperty({ example: 'student', enum: UserRole })
   @IsEnum(UserRole)
   @IsOptional()
   role: UserRole;

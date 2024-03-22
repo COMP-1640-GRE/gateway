@@ -19,6 +19,7 @@ import { UserRole } from 'src/users/entities/user.entity';
 import { ContributionsService } from './contributions.service';
 import {
   CreateContributionDto,
+  EvaluateDto,
   UpdateContributionDto,
 } from './dto/contribution.dto';
 import {
@@ -45,6 +46,7 @@ import { Owner } from 'src/decorators/owner.decorator';
         eager: true,
       },
       student: {
+        // TODO: check if is_anonymous
         eager: true,
       },
       semester: {
@@ -117,5 +119,23 @@ export class ContributionsController implements CrudController<Contribution> {
   @Owner(CONTRIBUTION_ENTITY, 'student_id')
   remove(@Param('id') id: string) {
     return this.service.remove(+id);
+  }
+
+  @Patch(':id/approve')
+  @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
+  approve(@Param('id') id: string) {
+    return this.service.approve(+id);
+  }
+
+  @Patch(':id/select')
+  @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
+  select(@Param('id') id: string) {
+    return this.service.select(+id);
+  }
+
+  @Patch(':id/evaluate')
+  @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
+  evaluate(@Param('id') id: string, @Body() dto: EvaluateDto) {
+    return this.service.evaluate(+id, dto);
   }
 }
