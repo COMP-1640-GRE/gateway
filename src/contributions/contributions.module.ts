@@ -4,9 +4,16 @@ import { ContributionsController } from './contributions.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Contribution } from './entities/contribution.entity';
 import { AttachmentsModule } from 'src/attachments/attachments.module';
+import { SemestersModule } from 'src/semesters/semesters.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [AttachmentsModule, TypeOrmModule.forFeature([Contribution])],
+  imports: [
+    UsersModule,
+    SemestersModule,
+    AttachmentsModule,
+    TypeOrmModule.forFeature([Contribution]),
+  ],
   controllers: [ContributionsController],
   providers: [ContributionsService],
   exports: [ContributionsService],

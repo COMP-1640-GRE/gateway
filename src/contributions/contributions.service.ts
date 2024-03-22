@@ -1,5 +1,10 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Cache } from 'cache-manager';
@@ -11,6 +16,9 @@ import {
   UpdateContributionDto,
 } from './dto/contribution.dto';
 import { Contribution } from './entities/contribution.entity';
+import { SemestersService } from 'src/semesters/semesters.service';
+import { Semester } from 'src/semesters/entities/semester.entity';
+import { UsersService } from 'src/users/users.service';
 
 const VIEW_CACHE_TIME = 5 * 60 * 1000;
 
@@ -19,6 +27,8 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
   constructor(
     @InjectRepository(Contribution)
     private contributionsRepository: Repository<Contribution>,
+    private readonly usersService: UsersService,
+    private readonly semestersService: SemestersService,
     private readonly attachmentsService: AttachmentsService,
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
@@ -32,11 +42,13 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     attachments: Array<Express.Multer.File>,
   ) {
     const attachmentsDto = this.attachmentsService.validate(attachments);
+    const semester = await this.getValidSemester(dto.semester_id);
+    const student = await this.getValidStudent(userId, semester);
 
     const contribution = await this.contributionsRepository.save({
       ...dto,
-      student: { id: userId },
-      semester: { id: dto.semester_id },
+      student,
+      semester,
     });
 
     try {
@@ -89,13 +101,15 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
 
   async update(
     id: number,
+    userId: number,
     { to_delete, ...dto }: UpdateContributionDto,
     attachments: Array<Express.Multer.File>,
   ) {
     const attachmentsDto = this.attachmentsService.validate(attachments);
-    const contribution = await this.contributionsRepository.findOne(id, {
-      relations: ['student'],
-    });
+    const contribution = await this.contributionsRepository.findOne(id);
+
+    const semester = await this.getValidSemester(dto.semester_id);
+    await this.getValidStudent(userId, semester);
 
     if (!contribution) {
       throw new NotFoundException(`Contribution with id ${id} not found`);
@@ -103,12 +117,9 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
 
     await this.attachmentsService.deletes(to_delete);
 
-    await this.attachmentsService.creates(
-      new Contribution({ id }),
-      attachmentsDto,
-    );
+    await this.attachmentsService.creates(contribution, attachmentsDto);
 
-    return await this.contributionsRepository.update(id, dto);
+    return await this.contributionsRepository.update(id, { ...dto, semester });
   }
 
   async remove(id: number) {
@@ -157,5 +168,45 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     }
 
     return await this.contributionsRepository.update(id, { evaluation });
+  }
+
+  async getValidSemester(id: number) {
+    const semester = await this.semestersService.findOne(id, {
+      relations: ['faculty'],
+    });
+
+    if (!semester) {
+      throw new NotFoundException(`Semester with id ${id} not found`);
+    }
+
+    const { start_date, end_date } = semester;
+
+    // make sure that now is between start date and end date
+    const now = new Date();
+    if (now < start_date || now > end_date) {
+      throw new BadRequestException(
+        'You can only create contribution in the current semester',
+      );
+    }
+
+    return semester;
+  }
+
+  async getValidStudent(id: number, semester: Semester) {
+    const student = await this.usersService.findOne(id, {
+      relations: ['faculty'],
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student with id ${id} not found`);
+    }
+
+    if (student.faculty.id !== semester.faculty.id) {
+      throw new BadRequestException(
+        'You can only create contribution in your faculty',
+      );
+    }
+
+    return student;
   }
 }

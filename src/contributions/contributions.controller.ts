@@ -119,8 +119,9 @@ export class ContributionsController implements CrudController<Contribution> {
       }),
     )
     attachments: Array<Express.Multer.File>,
+    @JwtPayload() { id: userId }: JwtPayloadType,
   ) {
-    return this.service.update(+id, dto, attachments);
+    return this.service.update(+id, userId, dto, attachments);
   }
 
   @Delete(':id')
@@ -131,7 +132,7 @@ export class ContributionsController implements CrudController<Contribution> {
   }
 
   @Patch(':id/approve')
-  @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
+  @Roles(UserRole.UNIVERSITY_MARKETING_MANAGER)
   approve(@Param('id') id: string) {
     return this.service.approve(+id);
   }
