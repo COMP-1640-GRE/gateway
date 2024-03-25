@@ -1,3 +1,4 @@
 [submodule "src/proto"]
 	path = src/proto
 	url = https://github.com/COMP-1640-GRE/proto
+	branch = main
