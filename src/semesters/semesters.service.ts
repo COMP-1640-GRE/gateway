@@ -19,11 +19,17 @@ export class SemestersService extends TypeOrmCrudService<Semester> {
   async create(dto: CreateSemesterDto) {
     const { faculty_id, ...semester } = dto;
 
-    const { start_date, end_date } = semester;
+    const { start_date, end_date, due_date } = semester;
 
     // make sure that start date is before end date
     if (start_date >= end_date) {
       throw new BadRequestException('Start date must be before end date');
+    }
+
+    if (due_date < end_date) {
+      throw new BadRequestException(
+        'Due date must be after the end date of the semester',
+      );
     }
 
     const faculty = await this.facultiesService.findById(faculty_id);

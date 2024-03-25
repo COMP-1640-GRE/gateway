@@ -30,6 +30,9 @@ export class Semester extends BaseEntity {
   @Column()
   end_date: Date;
 
+  @Column()
+  due_date: Date;
+
   @ManyToOne(() => Faculty, (faculty) => faculty.semesters, {
     eager: true,
     nullable: false,

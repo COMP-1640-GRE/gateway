@@ -108,7 +108,7 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     const attachmentsDto = this.attachmentsService.validate(attachments);
     const contribution = await this.contributionsRepository.findOne(id);
 
-    const semester = await this.getValidSemester(dto.semester_id);
+    const semester = await this.getValidSemester(dto.semester_id, true);
     await this.getValidStudent(userId, semester);
 
     if (!contribution) {
@@ -170,7 +170,7 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     return await this.contributionsRepository.update(id, { evaluation });
   }
 
-  async getValidSemester(id: number) {
+  async getValidSemester(id: number, checkDueDate = false) {
     const semester = await this.semestersService.findOne(id, {
       relations: ['faculty'],
     });
@@ -179,13 +179,19 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
       throw new NotFoundException(`Semester with id ${id} not found`);
     }
 
-    const { start_date, end_date } = semester;
+    const { start_date, end_date, due_date } = semester;
 
     // make sure that now is between start date and end date
     const now = new Date();
     if (now < start_date || now > end_date) {
       throw new BadRequestException(
         'You can only create contribution in the current semester',
+      );
+    }
+
+    if (checkDueDate && now > due_date) {
+      throw new BadRequestException(
+        'You can only create contribution before the due date of the semester',
       );
     }
 

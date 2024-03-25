@@ -30,9 +30,13 @@ export class CreateSemesterDto {
   @IsDateString()
   start_date: Date;
 
-  @ApiProperty({ example: '2024-12-31' })
+  @ApiProperty({ example: '2024-12-14' })
   @IsDateString()
   end_date: Date;
+
+  @ApiProperty({ example: '2024-12-31' })
+  @IsDateString()
+  due_date: Date;
 
   @ApiProperty({ example: 1 })
   @IsPositive()
