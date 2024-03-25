@@ -17,7 +17,7 @@ export class Semester extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ unique: true })
+  @Column()
   @Index()
   name: string;
 
