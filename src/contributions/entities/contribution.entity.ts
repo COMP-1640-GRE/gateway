@@ -13,6 +13,12 @@ export enum ContributionEvaluate {
   BAD = 'bad',
 }
 
+export enum ContributionStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+}
+
 @Entity({ name: CONTRIBUTION_ENTITY })
 export class Contribution extends BaseEntity {
   @Column()
@@ -33,6 +39,13 @@ export class Contribution extends BaseEntity {
 
   @Column({ default: false })
   is_anonymous: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: ContributionStatus,
+    default: ContributionStatus.PENDING,
+  })
+  status: ContributionStatus;
 
   @Column({
     type: 'enum',

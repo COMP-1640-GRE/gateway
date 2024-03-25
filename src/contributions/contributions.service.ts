@@ -15,7 +15,10 @@ import {
   EvaluateDto,
   UpdateContributionDto,
 } from './dto/contribution.dto';
-import { Contribution } from './entities/contribution.entity';
+import {
+  Contribution,
+  ContributionStatus,
+} from './entities/contribution.entity';
 import { SemestersService } from 'src/semesters/semesters.service';
 import { Semester } from 'src/semesters/entities/semester.entity';
 import { UsersService } from 'src/users/users.service';
@@ -119,7 +122,11 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
 
     await this.attachmentsService.creates(contribution, attachmentsDto);
 
-    return await this.contributionsRepository.update(id, { ...dto, semester });
+    return await this.contributionsRepository.update(id, {
+      ...dto,
+      semester,
+      status: ContributionStatus.PENDING,
+    });
   }
 
   async remove(id: number) {
