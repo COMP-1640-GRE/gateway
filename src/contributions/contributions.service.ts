@@ -222,4 +222,12 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
 
     return student;
   }
+
+  async selectMultiple(ids: number[]) {
+    return await this.contributionsRepository.update(ids, { selected: true });
+  }
+
+  async approveMultiple(ids: number[]) {
+    return await this.contributionsRepository.update(ids, { approved: true });
+  }
 }

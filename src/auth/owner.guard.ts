@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -34,7 +35,7 @@ export class OwnerGuard implements CanActivate {
     const id = Number(request.params.id) || Number(request.query.id);
 
     if (!user?.id || !id) {
-      return false;
+      throw new NotFoundException('User id or entity id not found');
     }
     const { relation, table, self, excludedRoles } = owner;
 
@@ -55,9 +56,21 @@ export class OwnerGuard implements CanActivate {
     }
 
     if (self) {
-      return entity.owner !== user.id;
+      if (entity.owner === user.id) {
+        throw new ForbiddenException(
+          `User with id ${user.id} is not allowed to access this resource`,
+        );
+      } else {
+        return true;
+      }
     }
 
-    return entity.owner === user.id;
+    if (entity.owner !== user.id) {
+      throw new ForbiddenException(
+        `User with id ${user.id} is not allowed to access this resource`,
+      );
+    } else {
+      return true;
+    }
   }
 }

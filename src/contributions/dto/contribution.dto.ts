@@ -53,3 +53,9 @@ export class EvaluateDto {
   @IsEnum(ContributionEvaluate)
   evaluation: ContributionEvaluate;
 }
+
+export class SelectManyDto {
+  @ApiProperty({ example: [1, 2], isArray: true })
+  @IsPositive({ each: true })
+  ids: number[];
+}

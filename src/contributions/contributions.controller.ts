@@ -33,6 +33,7 @@ import { ContributionsService } from './contributions.service';
 import {
   CreateContributionDto,
   EvaluateDto,
+  SelectManyDto,
   UpdateContributionDto,
 } from './dto/contribution.dto';
 import {
@@ -104,31 +105,16 @@ export class ContributionsController implements CrudController<Contribution> {
     return this.service.findOneById(+id, fp.id);
   }
 
-  @Patch(':id')
-  @Roles(UserRole.STUDENT)
-  @Owner(CONTRIBUTION_ENTITY, 'student_id')
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateContributionDto })
-  @UseInterceptors(FilesInterceptor('attachments'))
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateContributionDto,
-    @UploadedFiles(
-      new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 15 })],
-      }),
-    )
-    attachments: Array<Express.Multer.File>,
-    @JwtPayload() { id: userId }: JwtPayloadType,
-  ) {
-    return this.service.update(+id, userId, dto, attachments);
+  @Patch('approve-multiple')
+  @Roles(UserRole.UNIVERSITY_MARKETING_MANAGER)
+  approveMultiple(@Body() { ids }: SelectManyDto) {
+    return this.service.approveMultiple(ids);
   }
 
-  @Delete(':id')
-  @Roles(UserRole.STUDENT, UserRole.ADMINISTRATOR)
-  @Owner(CONTRIBUTION_ENTITY, 'student_id', false, [UserRole.ADMINISTRATOR])
-  remove(@Param('id') id: string) {
-    return this.service.remove(+id);
+  @Patch('select-multiple')
+  @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
+  selectMultiple(@Body() { ids }: SelectManyDto) {
+    return this.service.selectMultiple(ids);
   }
 
   @Patch(':id/approve')
@@ -159,5 +145,32 @@ export class ContributionsController implements CrudController<Contribution> {
 
     res.data = mapContributions(res.data);
     return res;
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.STUDENT)
+  @Owner(CONTRIBUTION_ENTITY, 'student_id')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateContributionDto })
+  @UseInterceptors(FilesInterceptor('attachments'))
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateContributionDto,
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 15 })],
+      }),
+    )
+    attachments: Array<Express.Multer.File>,
+    @JwtPayload() { id: userId }: JwtPayloadType,
+  ) {
+    return this.service.update(+id, userId, dto, attachments);
+  }
+
+  @Delete(':id')
+  @Roles(UserRole.STUDENT, UserRole.ADMINISTRATOR)
+  @Owner(CONTRIBUTION_ENTITY, 'student_id', false, [UserRole.ADMINISTRATOR])
+  remove(@Param('id') id: string) {
+    return this.service.remove(+id);
   }
 }
