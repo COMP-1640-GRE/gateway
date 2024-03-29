@@ -1,9 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  OnModuleInit,
+} from '@nestjs/common';
+import { ClientGrpc } from '@nestjs/microservices';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Attachment, AttachmentType } from './entities/attachment.entity';
+import { lastValueFrom } from 'rxjs';
+import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { Repository } from 'typeorm';
 import { CreateAttachmentDto } from './dto/attachment.dto';
-import { Contribution } from 'src/contributions/entities/contribution.entity';
+import { Attachment, AttachmentType } from './entities/attachment.entity';
 
 const DOCUMENT_TYPES = [
   'msword',
@@ -12,11 +19,18 @@ const DOCUMENT_TYPES = [
 const ACCEPTED_FILE_TYPES = ['jpg', 'jpeg', 'png'].concat(DOCUMENT_TYPES);
 
 @Injectable()
-export class AttachmentsService {
+export class AttachmentsService implements OnModuleInit {
+  private filesService: any;
+
   constructor(
     @InjectRepository(Attachment)
     private attachmentsRepository: Repository<Attachment>,
+    @Inject('FILE_TRANSFER_PACKAGE') private client: ClientGrpc,
   ) {}
+
+  onModuleInit() {
+    this.filesService = this.client.getService('FileTransfer');
+  }
 
   validate(attachments: Array<Express.Multer.File>): CreateAttachmentDto[] {
     if (!attachments || attachments.length === 0) {
@@ -61,16 +75,30 @@ export class AttachmentsService {
     type,
     contributionId,
   }: CreateAttachmentDto & { contributionId: number }) {
-    // TODO: call gRPC service
-    // upload to folder: `attachments/&{contributionId}`
-    return {
-      path: '',
-      type,
-    };
+    const res = await lastValueFrom<any>(
+      this.filesService.UploadFiles({
+        files: [file.buffer],
+        filenames: [file.originalname],
+        filepath: `attachments/${contributionId}`,
+      }),
+    );
+
+    const path = res?.urls?.[0];
+    if (path) {
+      return {
+        path,
+        type,
+      };
+    }
   }
 
   async deletes(to_delete: string[]) {
-    // TODO: call gRPC service
-    return;
+    try {
+      return Promise.all(
+        to_delete.map(async (url) => this.filesService.DeleteFile({ url })),
+      );
+    } catch (error) {
+      console.warn(error);
+    }
   }
 }

@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "postinstall": "git submodule update --recursive --remote",
+    "postinstall": "git submodule update --init --recursive --remote",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -22,11 +22,14 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.10.4",
+    "@grpc/proto-loader": "^0.7.12",
     "@nestjs/cache-manager": "^2.2.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^3.2.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/jwt": "^10.2.0",
+    "@nestjs/microservices": "^10.3.7",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/schedule": "^4.0.1",

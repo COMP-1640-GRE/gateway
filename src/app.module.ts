@@ -4,19 +4,19 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { NestjsFingerprintModule } from 'nestjs-fingerprint';
 import { join } from 'path';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { AttachmentsModule } from './attachments/attachments.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/jwt.guard';
+import { OwnerGuard } from './auth/owner.guard';
 import { RolesGuard } from './auth/roles.guard';
+import { ContributionsModule } from './contributions/contributions.module';
 import { FacultiesModule } from './faculties/faculties.module';
+import { ReviewsModule } from './reviews/reviews.module';
 import { SemestersModule } from './semesters/semesters.module';
 import { UsersModule } from './users/users.module';
-import { ContributionsModule } from './contributions/contributions.module';
-import { AttachmentsModule } from './attachments/attachments.module';
-import { NestjsFingerprintModule } from 'nestjs-fingerprint';
-import { ReviewsModule } from './reviews/reviews.module';
-import { OwnerGuard } from './auth/owner.guard';
 
 @Module({
   imports: [
