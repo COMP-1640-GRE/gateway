@@ -14,6 +14,7 @@ import {
 } from './dto/user.dto';
 import { AccountStatus, User, UserRole } from './entities/user.entity';
 import { isAlphanumeric } from 'class-validator';
+import { AttachmentsService } from 'src/attachments/attachments.service';
 
 @Injectable()
 export class UsersService extends TypeOrmCrudService<User> {
@@ -23,6 +24,7 @@ export class UsersService extends TypeOrmCrudService<User> {
     @InjectRepository(User)
     public usersRepository: Repository<User>,
     private facultiesService: FacultiesService,
+    private attachmentsService: AttachmentsService,
   ) {
     super(usersRepository);
     // check if users table is empty
@@ -242,5 +244,20 @@ export class UsersService extends TypeOrmCrudService<User> {
     await this.usersRepository.update(id, { account_status });
 
     return { ...user, account_status };
+  }
+
+  async avatar(id: number, file: Express.Multer.File) {
+    const user = await this.findById(id);
+    if (!user) {
+      throw new BadRequestException(`User with id ${id} not found`);
+    }
+
+    if (!file) {
+      throw new BadRequestException('File not found');
+    }
+
+    const avatar = await this.attachmentsService.uploadAvatar(id, file);
+
+    return this.usersRepository.update(id, { avatar: avatar.path });
   }
 }

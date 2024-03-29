@@ -1,5 +1,14 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Param,
+  Patch,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController } from '@nestjsx/crud';
 import {
   JwtPayload,
@@ -12,6 +21,7 @@ import {
   ChangePasswordDto,
   CreateUsersDto,
   UpdateUserDto,
+  UploadAvatarDto,
 } from './dto/user.dto';
 import { USER_ENTITY, User, UserRole } from './entities/user.entity';
 import { UsersService } from './users.service';
@@ -70,17 +80,15 @@ export class UsersController implements CrudController<User> {
     return this.service.update({ id, ...dto });
   }
 
-  // TODO: find one user that can list all it's paginated contributions.
-  // @Get(':username')
-  // findByUsername(@Param('id') username: string) {
-  //   return this.userService.findOneByUsername(username);
-  // }
-
-  @Patch(':id')
-  @Roles(UserRole.ADMINISTRATOR)
-  @ApiOperation({ summary: 'Admin update a user' })
-  adminUpdate(@Param('id') userId: string, @Body() dto: AdminUpdateUserDto) {
-    return this.service.adminUpdate(+userId, dto);
+  @Post('avatar')
+  @ApiBody({ type: UploadAvatarDto })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  avatar(
+    @UploadedFile() file: Express.Multer.File,
+    @JwtPayload() { id }: JwtPayloadType,
+  ) {
+    return this.service.avatar(id, file);
   }
 
   @Patch('change-password')
@@ -105,5 +113,12 @@ export class UsersController implements CrudController<User> {
   @Roles(UserRole.ADMINISTRATOR)
   lockUser(@Param('id') userId: string, @JwtPayload() { id }: JwtPayloadType) {
     return this.service.lockUser(+userId, +id);
+  }
+
+  @Patch(':id')
+  @Roles(UserRole.ADMINISTRATOR)
+  @ApiOperation({ summary: 'Admin update a user' })
+  adminUpdate(@Param('id') userId: string, @Body() dto: AdminUpdateUserDto) {
+    return this.service.adminUpdate(+userId, dto);
   }
 }

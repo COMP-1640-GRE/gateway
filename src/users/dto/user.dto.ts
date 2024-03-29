@@ -110,3 +110,8 @@ export class ChangePasswordDto {
   @ApiProperty({ example: 'superSecure@12' })
   new_password: string;
 }
+
+export class UploadAvatarDto {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: Express.Multer.File;
+}

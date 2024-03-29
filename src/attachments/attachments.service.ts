@@ -92,6 +92,23 @@ export class AttachmentsService implements OnModuleInit {
     }
   }
 
+  async uploadAvatar(userId: number, file: Express.Multer.File) {
+    const res = await lastValueFrom<any>(
+      this.filesService.UploadFiles({
+        files: [file.buffer],
+        filenames: [file.originalname],
+        filepath: `avatar/${userId}`,
+      }),
+    );
+
+    const path = res?.urls?.[0];
+    if (path) {
+      return {
+        path,
+      };
+    }
+  }
+
   async deletes(to_delete: string[]) {
     try {
       return Promise.all(

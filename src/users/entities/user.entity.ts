@@ -51,6 +51,9 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   last_name?: string;
 
+  @Column({ nullable: true })
+  avatar?: string;
+
   @Column({
     type: 'enum',
     enum: AccountStatus,
