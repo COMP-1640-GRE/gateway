@@ -13,10 +13,9 @@ import { CreateAttachmentDto } from './dto/attachment.dto';
 import { Attachment, AttachmentType } from './entities/attachment.entity';
 
 const DOCUMENT_TYPES = [
-  'msword',
-  'vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
-const ACCEPTED_FILE_TYPES = ['jpg', 'jpeg', 'png'].concat(DOCUMENT_TYPES);
 
 @Injectable()
 export class AttachmentsService implements OnModuleInit {
@@ -32,16 +31,25 @@ export class AttachmentsService implements OnModuleInit {
     this.filesService = this.client.getService('FileTransfer');
   }
 
-  validate(attachments: Array<Express.Multer.File>): CreateAttachmentDto[] {
+  validate(
+    attachments: Array<Express.Multer.File>,
+    required = true,
+  ): CreateAttachmentDto[] {
+    if (!required && (!attachments || attachments.length === 0)) {
+      return [];
+    }
     if (!attachments || attachments.length === 0) {
       throw new BadRequestException('Attachments are required');
     }
 
     return attachments.map((file) => {
-      const fileType = file.mimetype.split('/')[1];
-      if (!ACCEPTED_FILE_TYPES.includes(fileType.toLowerCase())) {
-        throw new BadRequestException('Invalid file type: ' + fileType);
+      const fileType = file.mimetype;
+      if (!fileType.toLowerCase().startsWith('image/')) {
+        if (!DOCUMENT_TYPES.includes(fileType.toLowerCase())) {
+          throw new BadRequestException('Invalid file type: ' + fileType);
+        }
       }
+
       let type = AttachmentType.IMAGE;
 
       if (DOCUMENT_TYPES.includes(fileType.toLowerCase())) {
@@ -111,9 +119,20 @@ export class AttachmentsService implements OnModuleInit {
 
   async deletes(to_delete: string[]) {
     try {
-      return Promise.all(
+      if (!to_delete || to_delete.length === 0) {
+        return;
+      }
+      const deleted = await Promise.all(
+        to_delete.map(async (path) =>
+          this.attachmentsRepository.delete({ path }),
+        ),
+      );
+
+      await Promise.all(
         to_delete.map(async (url) => this.filesService.DeleteFile({ url })),
       );
+
+      return deleted;
     } catch (error) {
       console.warn(error);
     }

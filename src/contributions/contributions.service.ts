@@ -108,7 +108,13 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     { to_delete, ...dto }: UpdateContributionDto,
     attachments: Array<Express.Multer.File>,
   ) {
-    const attachmentsDto = this.attachmentsService.validate(attachments);
+    let toDelete: string[] = [];
+    try {
+      toDelete = JSON.parse(to_delete);
+    } catch {
+      throw new BadRequestException('Invalid to_delete');
+    }
+    const attachmentsDto = this.attachmentsService.validate(attachments, false);
     const contribution = await this.contributionsRepository.findOne(id);
 
     const semester = await this.getValidSemester(dto.semester_id, true);
@@ -118,11 +124,12 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
       throw new NotFoundException(`Contribution with id ${id} not found`);
     }
 
-    await this.attachmentsService.deletes(to_delete);
+    await this.attachmentsService.deletes(toDelete);
 
     await this.attachmentsService.creates(contribution, attachmentsDto);
 
-    return await this.contributionsRepository.update(id, {
+    return await this.contributionsRepository.save({
+      id,
       ...dto,
       semester,
       status: ContributionStatus.PENDING,

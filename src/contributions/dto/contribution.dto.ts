@@ -40,9 +40,18 @@ export class CreateContributionDto {
 }
 
 export class UpdateContributionDto extends CreateContributionDto {
-  @ApiProperty({ isArray: true, example: ['1', '2'] })
-  @IsString({ each: true })
-  to_delete: string[];
+  @ApiProperty({ isArray: true, example: ['1', '2'], required: false })
+  @IsString()
+  @IsOptional()
+  to_delete: string;
+
+  @ApiProperty({
+    type: 'array',
+    items: { type: 'string', format: 'binary' },
+    required: false,
+  })
+  @IsOptional()
+  attachments: Express.Multer.File[];
 }
 
 export class EvaluateDto {

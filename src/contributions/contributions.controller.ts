@@ -159,6 +159,7 @@ export class ContributionsController implements CrudController<Contribution> {
     @UploadedFiles(
       new ParseFilePipe({
         validators: [new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 15 })],
+        fileIsRequired: false,
       }),
     )
     attachments: Array<Express.Multer.File>,
