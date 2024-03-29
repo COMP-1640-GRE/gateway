@@ -46,26 +46,13 @@ export class AuthService {
     const { username, password, remember = false } = dto;
 
     const user = await this.validateUser(username, password);
-    const {
-      id: id,
-      role,
-      secret,
-      account_status,
-      email,
-      first_name,
-      last_name,
-      faculty,
-    } = user;
+    const { id, secret, account_status, password: _, ...rest } = user;
 
     const payload: JwtPayloadType = {
+      ...rest,
       id,
       username,
-      role,
-      email,
-      first_name,
-      last_name,
       account_status,
-      faculty_id: faculty?.id,
     };
 
     // if user is not active

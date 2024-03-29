@@ -18,4 +18,5 @@ export type JwtPayloadType = {
   first_name?: string;
   last_name?: string;
   faculty_id?: number;
+  avatar?: string;
 };
