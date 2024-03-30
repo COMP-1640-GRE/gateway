@@ -258,6 +258,7 @@ export class UsersService extends TypeOrmCrudService<User> {
 
     const avatar = await this.attachmentsService.uploadAvatar(id, file);
 
-    return this.usersRepository.update(id, { avatar: avatar.path });
+    await this.usersRepository.update(id, { avatar: avatar.path });
+    return avatar;
   }
 }
