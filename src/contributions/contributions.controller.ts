@@ -128,10 +128,6 @@ export class ContributionsController implements CrudController<Contribution> {
 
   @Post('download')
   @Roles(UserRole.UNIVERSITY_MARKETING_MANAGER)
-  // @Header(
-  //   'Content-Disposition',
-  //   'attachment; filename="contributions.zip"; mime-type="application/zip"',
-  // )
   download(@Body() { ids }: SelectManyDto) {
     return this.service.download(ids);
   }
@@ -168,14 +164,22 @@ export class ContributionsController implements CrudController<Contribution> {
   }
 
   @Override('getManyBase')
-  async getMany(@ParsedRequest() req: CrudRequest) {
+  async getMany(
+    @ParsedRequest() req: CrudRequest,
+    @JwtPayload() { id: userId }: JwtPayloadType,
+  ) {
+    const sorts = [...req.parsed.sort];
+    req.parsed.sort = req.parsed.sort.filter(
+      (s) => s.field !== 'like' && s.field !== 'dislike',
+    );
+
     const res = await this.base.getManyBase(req);
 
     if (Array.isArray(res)) {
-      return mapContributions(res);
+      return mapContributions(res, +userId, sorts);
     }
 
-    res.data = mapContributions(res.data);
+    res.data = mapContributions(res.data, +userId, sorts);
     return res;
   }
 

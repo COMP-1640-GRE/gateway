@@ -41,6 +41,8 @@ export class ReactionsService extends TypeOrmCrudService<Reaction> {
     } else if (comment_id) {
     }
 
-    return true;
+    return {
+      message: 'success',
+    };
   }
 }

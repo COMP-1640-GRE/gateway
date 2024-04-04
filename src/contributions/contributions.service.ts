@@ -76,6 +76,8 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
           'reviews.reviewer',
           'semester',
           'semester.faculty',
+          'reactions',
+          'reactions.user',
         ],
       },
     );

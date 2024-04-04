@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
 import { Reaction } from 'src/reactions/entities/reaction.entity';
@@ -51,6 +51,11 @@ export class User extends BaseEntity {
 
   @Column({ nullable: true })
   last_name?: string;
+
+  @Expose()
+  get full_name() {
+    return `${this.first_name ?? ''} ${this.last_name ?? ''}`.trim();
+  }
 
   @Column({ nullable: true })
   avatar?: string;
