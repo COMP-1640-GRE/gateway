@@ -9,7 +9,10 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { ContributionEvaluate } from '../entities/contribution.entity';
+import {
+  ContributionEvaluate,
+  ContributionStatus,
+} from '../entities/contribution.entity';
 
 export class CreateContributionDto {
   @ApiProperty({ example: 'My contribution' })
@@ -61,6 +64,15 @@ export class EvaluateDto {
   })
   @IsEnum(ContributionEvaluate)
   evaluation: ContributionEvaluate;
+}
+
+export class StatusDto {
+  @ApiProperty({
+    example: ContributionStatus.PENDING,
+    enum: ContributionStatus,
+  })
+  @IsEnum(ContributionStatus)
+  status: ContributionStatus;
 }
 
 export class SelectManyDto {

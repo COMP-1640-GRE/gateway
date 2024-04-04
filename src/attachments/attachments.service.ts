@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  NotFoundException,
   OnModuleInit,
 } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
@@ -136,5 +137,16 @@ export class AttachmentsService implements OnModuleInit {
     } catch (error) {
       console.warn(error);
     }
+  }
+
+  async download(filename: string, urls: string[]) {
+    if (!urls || urls.length === 0) {
+      throw new NotFoundException('Attachments not found');
+    }
+
+    return this.filesService.DownloadMultipleFileAsZip({
+      filename,
+      urls,
+    });
   }
 }

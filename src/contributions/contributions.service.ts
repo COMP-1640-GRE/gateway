@@ -9,19 +9,20 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Cache } from 'cache-manager';
 import { AttachmentsService } from 'src/attachments/attachments.service';
+import { Semester } from 'src/semesters/entities/semester.entity';
+import { SemestersService } from 'src/semesters/semesters.service';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import {
   CreateContributionDto,
   EvaluateDto,
+  StatusDto,
   UpdateContributionDto,
 } from './dto/contribution.dto';
 import {
   Contribution,
   ContributionStatus,
 } from './entities/contribution.entity';
-import { SemestersService } from 'src/semesters/semesters.service';
-import { Semester } from 'src/semesters/entities/semester.entity';
-import { UsersService } from 'src/users/users.service';
 
 const VIEW_CACHE_TIME = 5 * 60 * 1000;
 
@@ -151,17 +152,6 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     return this.contributionsRepository.remove(contribution);
   }
 
-  async approve(id: number) {
-    const contribution = await this.contributionsRepository.findOne(id);
-
-    if (!contribution) {
-      throw new NotFoundException(`Contribution with id ${id} not found`);
-    }
-
-    return await this.contributionsRepository.update(id, {
-      approved: !contribution.approved,
-    });
-  }
   async select(id: number) {
     const contribution = await this.contributionsRepository.findOne(id);
 
@@ -182,6 +172,15 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     }
 
     return await this.contributionsRepository.update(id, { evaluation });
+  }
+  async status(id: number, { status }: StatusDto) {
+    const contribution = await this.contributionsRepository.findOne(id);
+
+    if (!contribution) {
+      throw new NotFoundException(`Contribution with id ${id} not found`);
+    }
+
+    return await this.contributionsRepository.update(id, { status });
   }
 
   async getValidSemester(id: number, checkDueDate = false) {
@@ -234,7 +233,19 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     return await this.contributionsRepository.update(ids, { selected: true });
   }
 
-  async approveMultiple(ids: number[]) {
-    return await this.contributionsRepository.update(ids, { approved: true });
+  async download(ids: number[]) {
+    const contributions = await this.contributionsRepository.findByIds(ids, {
+      relations: ['attachments'],
+    });
+
+    if (!contributions || contributions.length === 0) {
+      throw new NotFoundException('Contributions not found');
+    }
+
+    const attachments = contributions.flatMap(({ attachments }) =>
+      attachments.map(({ path }) => path).filter(Boolean),
+    );
+
+    return this.attachmentsService.download('contributions', attachments);
   }
 }

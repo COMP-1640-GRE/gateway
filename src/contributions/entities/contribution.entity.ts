@@ -35,9 +35,6 @@ export class Contribution extends BaseEntity {
   selected: boolean;
 
   @Column({ default: false })
-  approved: boolean;
-
-  @Column({ default: false })
   is_anonymous: boolean;
 
   @Column({

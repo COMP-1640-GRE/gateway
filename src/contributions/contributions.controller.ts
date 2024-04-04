@@ -34,6 +34,7 @@ import {
   CreateContributionDto,
   EvaluateDto,
   SelectManyDto,
+  StatusDto,
   UpdateContributionDto,
 } from './dto/contribution.dto';
 import {
@@ -108,26 +109,24 @@ export class ContributionsController implements CrudController<Contribution> {
     return this.service.findOneById(+id, fp.id);
   }
 
-  @Patch('approve-multiple')
-  @Roles(UserRole.UNIVERSITY_MARKETING_MANAGER)
-  approveMultiple(@Body() { ids }: SelectManyDto) {
-    return this.service.approveMultiple(ids);
-  }
-
   @Patch('select-multiple')
-  @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
+  @Roles(UserRole.UNIVERSITY_MARKETING_MANAGER)
   selectMultiple(@Body() { ids }: SelectManyDto) {
     return this.service.selectMultiple(ids);
   }
 
-  @Patch(':id/approve')
+  @Post('download')
   @Roles(UserRole.UNIVERSITY_MARKETING_MANAGER)
-  approve(@Param('id') id: string) {
-    return this.service.approve(+id);
+  // @Header(
+  //   'Content-Disposition',
+  //   'attachment; filename="contributions.zip"; mime-type="application/zip"',
+  // )
+  download(@Body() { ids }: SelectManyDto) {
+    return this.service.download(ids);
   }
 
   @Patch(':id/select')
-  @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
+  @Roles(UserRole.UNIVERSITY_MARKETING_MANAGER)
   select(@Param('id') id: string) {
     return this.service.select(+id);
   }
@@ -136,6 +135,12 @@ export class ContributionsController implements CrudController<Contribution> {
   @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
   evaluate(@Param('id') id: string, @Body() dto: EvaluateDto) {
     return this.service.evaluate(+id, dto);
+  }
+
+  @Patch(':id/status')
+  @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
+  status(@Param('id') id: string, @Body() dto: StatusDto) {
+    return this.service.status(+id, dto);
   }
 
   @Override('getManyBase')
