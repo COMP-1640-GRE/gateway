@@ -1,4 +1,5 @@
 import { Attachment } from 'src/attachments/entities/attachment.entity';
+import { Reaction } from 'src/reactions/entities/reaction.entity';
 import { Review } from 'src/reviews/entities/review.entity';
 import { Semester } from 'src/semesters/entities/semester.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -68,6 +69,9 @@ export class Contribution extends BaseEntity {
 
   @OneToMany(() => Review, (review) => review.contribution)
   reviews: Review[];
+
+  @OneToMany(() => Reaction, (reaction) => reaction.contribution)
+  reactions: Reaction[];
 
   constructor(partial: Partial<Contribution>) {
     super();

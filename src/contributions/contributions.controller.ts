@@ -41,6 +41,8 @@ import {
   CONTRIBUTION_ENTITY,
   Contribution,
 } from './entities/contribution.entity';
+import { CreateReactionDto } from 'src/reactions/dto/create-reaction.dto';
+import { ReactionsService } from 'src/reactions/reactions.service';
 
 @ApiTags('Contributions')
 @Controller('contributions')
@@ -67,6 +69,12 @@ import {
       'semester.faculty': {
         eager: true,
       },
+      reactions: {
+        eager: true,
+      },
+      'reactions.user': {
+        eager: true,
+      },
     },
     cache: 200,
   },
@@ -82,7 +90,10 @@ import {
   },
 })
 export class ContributionsController implements CrudController<Contribution> {
-  constructor(public service: ContributionsService) {}
+  constructor(
+    public service: ContributionsService,
+    private readonly reactionsService: ReactionsService,
+  ) {}
   get base(): CrudController<Contribution> {
     return this;
   }
@@ -141,6 +152,19 @@ export class ContributionsController implements CrudController<Contribution> {
   @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
   status(@Param('id') id: string, @Body() dto: StatusDto) {
     return this.service.status(+id, dto);
+  }
+
+  @Post(':id/reaction')
+  reaction(
+    @Param('id') id: string,
+    @Body() { type }: CreateReactionDto,
+    @JwtPayload() { id: userId }: JwtPayloadType,
+  ) {
+    return this.reactionsService.reaction({
+      user_id: +userId,
+      contribution_id: +id,
+      type,
+    });
   }
 
   @Override('getManyBase')

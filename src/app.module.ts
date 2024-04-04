@@ -17,6 +17,7 @@ import { FacultiesModule } from './faculties/faculties.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { SemestersModule } from './semesters/semesters.module';
 import { UsersModule } from './users/users.module';
+import { ReactionsModule } from './reactions/reactions.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { UsersModule } from './users/users.module';
     ContributionsModule,
     AttachmentsModule,
     ReviewsModule,
+    ReactionsModule,
   ],
   controllers: [],
   providers: [

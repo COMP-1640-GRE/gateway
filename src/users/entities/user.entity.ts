@@ -1,6 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
+import { Reaction } from 'src/reactions/entities/reaction.entity';
 import { Review } from 'src/reviews/entities/review.entity';
 import { BaseEntity } from 'src/utils/entity/base-entity';
 import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
@@ -73,6 +74,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Review, (review) => review.reviewer, {})
   reviews: Review[];
+
+  @OneToMany(() => Reaction, (reaction) => reaction.user, {})
+  reactions: Reaction[];
 
   constructor(partial: Partial<User>) {
     super();
