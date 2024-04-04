@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { CookieOptions, Response } from 'express';
 import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
-import { AccountStatus, User } from 'src/users/entities/user.entity';
+import { AccountStatus, User, UserRole } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { ActiveAccountDto, LoginDto } from './dto/auth.dto';
 import { REFRESH_TOKEN_KEY, TOKEN_KEY } from './jwt.strategy';
@@ -46,11 +46,12 @@ export class AuthService {
     const { username, password, remember = false } = dto;
 
     const user = await this.validateUser(username, password);
-    const { id, secret, account_status, password: _, ...rest } = user;
+    const { id, role, secret, account_status, password: _, ...rest } = user;
 
     const payload: JwtPayloadType = {
       ...rest,
       id,
+      role,
       username,
       account_status,
     };
@@ -68,6 +69,17 @@ export class AuthService {
       throw new ForbiddenException(
         'Your account is locked. Please contact administrator',
       );
+    }
+
+    if (
+      [
+        UserRole.GUEST,
+        UserRole.STUDENT,
+        UserRole.FACULTY_MARKETING_COORDINATOR,
+      ].includes(role) &&
+      !rest.faculty
+    ) {
+      throw new ForbiddenException('You must have a faculty assigned');
     }
 
     const access_token = await this.jwtService.signAsync(payload, { secret });

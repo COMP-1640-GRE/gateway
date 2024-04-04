@@ -25,7 +25,7 @@ export class Contribution extends BaseEntity {
   @Index()
   title: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @Column({ default: 0 })

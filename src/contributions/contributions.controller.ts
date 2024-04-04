@@ -54,6 +54,9 @@ import {
       attachments: {
         eager: true,
       },
+      reviews: {
+        eager: true,
+      },
       student: {
         eager: true,
       },

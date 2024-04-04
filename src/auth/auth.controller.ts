@@ -1,6 +1,10 @@
 import { Body, Controller, Get, Patch, Post, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import {
+  JwtPayload,
+  JwtPayloadType,
+} from 'src/decorators/jwt-payload.decorator';
 import { Public } from 'src/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { ActiveAccountDto, LoginDto } from './dto/auth.dto';
@@ -38,9 +42,10 @@ export class AuthController {
   }
 
   @Get('introspect')
-  introspect() {
+  introspect(@JwtPayload() user: JwtPayloadType) {
     return {
       authenticated: true,
+      ...user,
     };
   }
 }
