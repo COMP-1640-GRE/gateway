@@ -23,11 +23,11 @@ export class Comment extends BaseEntity {
 
   @ManyToOne(() => User, (user) => user.comments, { onDelete: 'CASCADE' })
   @Exclude({ toPlainOnly: true })
-  user: User;
+  db_author: User;
 
   @Expose()
   get author() {
-    return this.is_anonymous ? null : this.user;
+    return this.is_anonymous ? null : this.db_author;
   }
 
   @Column({ default: false })

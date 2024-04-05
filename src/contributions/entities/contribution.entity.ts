@@ -59,11 +59,11 @@ export class Contribution extends BaseEntity {
     eager: true,
     onDelete: 'CASCADE',
   })
-  user: User;
+  db_author: User;
 
   @Expose()
   get author() {
-    return this.is_anonymous ? null : this.user;
+    return this.is_anonymous ? null : this.db_author;
   }
 
   @ManyToOne(() => Semester, (semester) => semester.contributions, {

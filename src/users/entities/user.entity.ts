@@ -75,7 +75,7 @@ export class User extends BaseEntity {
   })
   faculty: Faculty;
 
-  @OneToMany(() => Contribution, (contribution) => contribution.user, {})
+  @OneToMany(() => Contribution, (contribution) => contribution.db_author, {})
   contributions: Contribution[];
 
   @OneToMany(() => Review, (review) => review.reviewer, {})
@@ -84,7 +84,7 @@ export class User extends BaseEntity {
   @OneToMany(() => Reaction, (reaction) => reaction.user, {})
   reactions: Reaction[];
 
-  @OneToMany(() => Comment, (comment) => comment.user, {})
+  @OneToMany(() => Comment, (comment) => comment.db_author, {})
   comments: Comment[];
 
   constructor(partial: Partial<User>) {

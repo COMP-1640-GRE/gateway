@@ -60,9 +60,8 @@ import { ReactionsService } from 'src/reactions/reactions.service';
       reviews: {
         eager: true,
       },
-      user: {
+      db_author: {
         eager: true,
-        alias: 'author',
       },
       semester: {
         eager: true,
