@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { TreeRepository } from 'typeorm';
 import { CreateCommentDto } from './dto/comment.dto';
-import { COMMENT_ENTITY, Comment } from './entities/comment.entity';
+import { Comment } from './entities/comment.entity';
 
 @Injectable()
 export class CommentsService extends TypeOrmCrudService<Comment> {
@@ -15,7 +15,7 @@ export class CommentsService extends TypeOrmCrudService<Comment> {
   }
 
   async create(userId: number, dto: CreateCommentDto) {
-    const { contribution_id, parent_id, content } = dto;
+    const { contribution_id, parent_id, ...rest } = dto;
     if (!contribution_id && !parent_id) {
       throw new BadRequestException('Comment must have contribution or parent');
     }
@@ -35,7 +35,7 @@ export class CommentsService extends TypeOrmCrudService<Comment> {
       parent,
       contribution,
       user: { id: userId },
-      content,
+      ...rest,
     });
   }
 

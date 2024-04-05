@@ -1,3 +1,4 @@
+import { Exclude, Expose } from 'class-transformer';
 import { Attachment } from 'src/attachments/entities/attachment.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
 import { Reaction } from 'src/reactions/entities/reaction.entity';
@@ -53,11 +54,17 @@ export class Contribution extends BaseEntity {
   })
   evaluation: ContributionEvaluate;
 
+  @Exclude({ toPlainOnly: true })
   @ManyToOne(() => User, (user) => user.contributions, {
     eager: true,
     onDelete: 'CASCADE',
   })
-  student: User;
+  user: User;
+
+  @Expose()
+  get author() {
+    return this.is_anonymous ? null : this.user;
+  }
 
   @ManyToOne(() => Semester, (semester) => semester.contributions, {
     eager: true,

@@ -10,9 +10,6 @@ export const mapContributions = (
   const reactionType = Object.values(ReactionType);
 
   contributions = contributions.map((contribution) => {
-    if (contribution.is_anonymous) {
-      delete contribution.student;
-    }
     const reaction = contribution.reactions.reduce(
       (acc, curr) => {
         if (curr.user.id === userId) {

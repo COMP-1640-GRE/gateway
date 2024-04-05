@@ -75,7 +75,7 @@ export class User extends BaseEntity {
   })
   faculty: Faculty;
 
-  @OneToMany(() => Contribution, (contribution) => contribution.student, {})
+  @OneToMany(() => Contribution, (contribution) => contribution.user, {})
   contributions: Contribution[];
 
   @OneToMany(() => Review, (review) => review.reviewer, {})

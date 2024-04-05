@@ -1,3 +1,4 @@
+import { Exclude, Expose } from 'class-transformer';
 import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { Reaction } from 'src/reactions/entities/reaction.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -21,7 +22,16 @@ export class Comment extends BaseEntity {
   content: string;
 
   @ManyToOne(() => User, (user) => user.comments, { onDelete: 'CASCADE' })
+  @Exclude({ toPlainOnly: true })
   user: User;
+
+  @Expose()
+  get author() {
+    return this.is_anonymous ? null : this.user;
+  }
+
+  @Column({ default: false })
+  is_anonymous: boolean;
 
   @ManyToOne(() => Contribution, (contribution) => contribution.comments, {
     onDelete: 'CASCADE',

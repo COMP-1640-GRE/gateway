@@ -60,8 +60,9 @@ import { ReactionsService } from 'src/reactions/reactions.service';
       reviews: {
         eager: true,
       },
-      student: {
+      user: {
         eager: true,
+        alias: 'author',
       },
       semester: {
         eager: true,
@@ -82,7 +83,7 @@ import { ReactionsService } from 'src/reactions/reactions.service';
     cache: 200,
   },
   routes: {
-    only: ['getManyBase'],
+    only: ['getManyBase', 'getOneBase'],
   },
   params: {
     id: {
@@ -123,9 +124,9 @@ export class ContributionsController implements CrudController<Contribution> {
     return this.service.getComments(+id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string, @Fingerprint() fp: IFingerprint) {
-    return this.service.findOneById(+id, fp.id);
+  @Override('getOneBase')
+  findOne(@ParsedRequest() req: CrudRequest, @Fingerprint() fp: IFingerprint) {
+    return this.service.findOneById(req, fp.id);
   }
 
   @Patch('select-multiple')

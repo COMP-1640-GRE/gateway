@@ -24,6 +24,7 @@ import {
   ContributionStatus,
 } from './entities/contribution.entity';
 import { CommentsService } from 'src/comments/comments.service';
+import { CrudRequest } from '@nestjsx/crud';
 
 const VIEW_CACHE_TIME = 5 * 60 * 1000;
 
@@ -67,29 +68,14 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     return contribution;
   }
 
-  async findOneById(id: number, fingerprint: string) {
-    const contribution = await this.contributionsRepository.findOne(
-      { id },
-      {
-        relations: [
-          'attachments',
-          'student',
-          'reviews',
-          'reviews.reviewer',
-          'semester',
-          'semester.faculty',
-          'reactions',
-          'reactions.user',
-          'comments',
-        ],
-      },
-    );
+  async findOneById(req: CrudRequest, fingerprint: string) {
+    const contribution = await this.getOne(req);
 
     if (!contribution) {
-      throw new NotFoundException(`Contribution with id ${id} not found`);
+      throw new NotFoundException(`Contribution not found`);
     }
 
-    const key = `contribution-${id}-${fingerprint}`;
+    const key = `contribution-${contribution.id}-${fingerprint}`;
 
     const cache = await this.cacheManager.get<boolean>(key);
 
@@ -99,10 +85,6 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
       contribution.view_count++;
 
       await this.contributionsRepository.save(contribution);
-    }
-
-    if (contribution.is_anonymous) {
-      contribution.student = undefined;
     }
 
     return contribution;
