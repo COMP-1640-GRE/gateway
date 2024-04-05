@@ -35,6 +35,7 @@ export const mapContributions = (
     );
 
     contribution['reaction'] = reaction;
+    contribution['comment_count'] = contribution.comments.length;
 
     return contribution;
   });
@@ -46,6 +47,13 @@ export const mapContributions = (
       contributions.sort(
         (a, b) =>
           (a['reaction'][field] - b['reaction'][field]) *
+          (order === 'ASC' ? 1 : -1),
+      );
+    }
+    if (sort.field === 'comment_count') {
+      contributions.sort(
+        (a, b) =>
+          (a['comment_count'] - b['comment_count']) *
           (order === 'ASC' ? 1 : -1),
       );
     }

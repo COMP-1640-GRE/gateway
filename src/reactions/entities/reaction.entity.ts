@@ -1,3 +1,4 @@
+import { Comment } from 'src/comments/entities/comment.entity';
 import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { User } from 'src/users/entities/user.entity';
 import { BaseEntity } from 'src/utils/entity/base-entity';
@@ -21,10 +22,11 @@ export class Reaction extends BaseEntity {
   })
   contribution: Contribution;
 
-  //   @ManyToOne(() => Comment, (comment) => comment.reactions, {
-  //     onDelete: 'CASCADE',
-  //   })
-  //   comment: Comment;
+  @ManyToOne(() => Comment, (comment) => comment.reactions, {
+    onDelete: 'CASCADE',
+    nullable: true,
+  })
+  comment: Comment;
 
   @Column({
     type: 'enum',

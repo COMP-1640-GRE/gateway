@@ -1,4 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
+import { Comment } from 'src/comments/entities/comment.entity';
 import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
 import { Reaction } from 'src/reactions/entities/reaction.entity';
@@ -82,6 +83,9 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Reaction, (reaction) => reaction.user, {})
   reactions: Reaction[];
+
+  @OneToMany(() => Comment, (comment) => comment.user, {})
+  comments: Comment[];
 
   constructor(partial: Partial<User>) {
     super();

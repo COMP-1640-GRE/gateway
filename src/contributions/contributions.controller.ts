@@ -75,6 +75,9 @@ import { ReactionsService } from 'src/reactions/reactions.service';
       'reactions.user': {
         eager: true,
       },
+      comments: {
+        eager: true,
+      },
     },
     cache: 200,
   },
@@ -113,6 +116,11 @@ export class ContributionsController implements CrudController<Contribution> {
     @JwtPayload() { id: userId }: JwtPayloadType,
   ) {
     return this.service.create(userId, dto, attachments);
+  }
+
+  @Get(':id/comments')
+  getComments(@Param('id') id: string) {
+    return this.service.getComments(+id);
   }
 
   @Get(':id')
@@ -170,7 +178,10 @@ export class ContributionsController implements CrudController<Contribution> {
   ) {
     const sorts = [...req.parsed.sort];
     req.parsed.sort = req.parsed.sort.filter(
-      (s) => s.field !== 'like' && s.field !== 'dislike',
+      (s) =>
+        s.field !== 'like' &&
+        s.field !== 'dislike' &&
+        s.field !== 'comment_count',
     );
 
     const res = await this.base.getManyBase(req);

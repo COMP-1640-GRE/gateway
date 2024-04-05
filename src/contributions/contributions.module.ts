@@ -7,10 +7,12 @@ import { AttachmentsModule } from 'src/attachments/attachments.module';
 import { SemestersModule } from 'src/semesters/semesters.module';
 import { UsersModule } from 'src/users/users.module';
 import { ReactionsModule } from 'src/reactions/reactions.module';
+import { CommentsModule } from 'src/comments/comments.module';
 
 @Module({
   imports: [
     UsersModule,
+    CommentsModule,
     SemestersModule,
     ReactionsModule,
     AttachmentsModule,

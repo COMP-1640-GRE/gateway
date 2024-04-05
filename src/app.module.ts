@@ -18,6 +18,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { SemestersModule } from './semesters/semesters.module';
 import { UsersModule } from './users/users.module';
 import { ReactionsModule } from './reactions/reactions.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ReactionsModule } from './reactions/reactions.module';
     AttachmentsModule,
     ReviewsModule,
     ReactionsModule,
+    CommentsModule,
   ],
   controllers: [],
   providers: [

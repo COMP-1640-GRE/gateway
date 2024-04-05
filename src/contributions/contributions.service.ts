@@ -23,6 +23,7 @@ import {
   Contribution,
   ContributionStatus,
 } from './entities/contribution.entity';
+import { CommentsService } from 'src/comments/comments.service';
 
 const VIEW_CACHE_TIME = 5 * 60 * 1000;
 
@@ -34,6 +35,7 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     private readonly usersService: UsersService,
     private readonly semestersService: SemestersService,
     private readonly attachmentsService: AttachmentsService,
+    private readonly commentsService: CommentsService,
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
   ) {
@@ -78,6 +80,7 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
           'semester.faculty',
           'reactions',
           'reactions.user',
+          'comments',
         ],
       },
     );
@@ -103,6 +106,10 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     }
 
     return contribution;
+  }
+
+  async getComments(id: number) {
+    return await this.commentsService.getComments(id);
   }
 
   async update(
@@ -175,6 +182,7 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
 
     return await this.contributionsRepository.update(id, { evaluation });
   }
+
   async status(id: number, { status }: StatusDto) {
     const contribution = await this.contributionsRepository.findOne(id);
 
