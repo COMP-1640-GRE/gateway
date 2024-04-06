@@ -1,6 +1,6 @@
 import { Exclude, Expose } from 'class-transformer';
 import { Contribution } from 'src/contributions/entities/contribution.entity';
-import { Reaction } from 'src/reactions/entities/reaction.entity';
+import { Reaction, ReactionType } from 'src/reactions/entities/reaction.entity';
 import { User } from 'src/users/entities/user.entity';
 import { BaseEntity } from 'src/utils/entity/base-entity';
 import {
@@ -39,8 +39,27 @@ export class Comment extends BaseEntity {
   })
   contribution: Contribution;
 
-  @OneToMany(() => Reaction, (reaction) => reaction.contribution)
+  @OneToMany(() => Reaction, (reaction) => reaction.comment)
   reactions: Reaction[];
+
+  @Expose()
+  get reaction() {
+    return this.reactions?.reduce(
+      (acc, curr) => {
+        Object.values(ReactionType).forEach((type) => {
+          if (curr.type === type) {
+            acc[type] = acc[type] + 1;
+          }
+        });
+
+        return acc;
+      },
+      {
+        like: 0,
+        dislike: 0,
+      },
+    );
+  }
 
   @TreeParent({ onDelete: 'CASCADE' })
   parent: Comment;

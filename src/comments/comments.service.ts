@@ -34,7 +34,7 @@ export class CommentsService extends TypeOrmCrudService<Comment> {
     return this.commentRepository.save({
       parent,
       contribution,
-      user: { id: userId },
+      db_author: { id: userId },
       ...rest,
     });
   }
@@ -42,13 +42,13 @@ export class CommentsService extends TypeOrmCrudService<Comment> {
   async getComments(contributionId: number) {
     const rootComments = await this.commentRepository.find({
       where: { contribution: { id: contributionId }, parent: null },
-      relations: ['user', 'reactions', 'reactions.user'],
+      relations: ['db_author', 'reactions', 'reactions.user'],
     });
 
     const rootCommentsWithChildren = await Promise.all(
       rootComments.map(async (rootComment) =>
         this.commentRepository.findDescendantsTree(rootComment, {
-          relations: ['user', 'reactions', 'reactions.user'],
+          relations: ['db_author', 'reactions', 'reactions.user'],
         }),
       ),
     );

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Crud, CrudController } from '@nestjsx/crud';
 import { Owner } from 'src/decorators/owner.decorator';
@@ -9,6 +9,8 @@ import {
   JwtPayload,
   JwtPayloadType,
 } from 'src/decorators/jwt-payload.decorator';
+import { CreateReactionDto } from 'src/reactions/dto/create-reaction.dto';
+import { ReactionsService } from 'src/reactions/reactions.service';
 
 @ApiTags('Comments')
 @Controller('comments')
@@ -24,10 +26,10 @@ import {
   routes: {
     only: ['getOneBase', 'updateOneBase', 'deleteOneBase'],
     updateOneBase: {
-      decorators: [Owner(COMMENT_ENTITY, 'user_id')],
+      decorators: [Owner(COMMENT_ENTITY, 'db_author_id')],
     },
     deleteOneBase: {
-      decorators: [Owner(COMMENT_ENTITY, 'user_id')],
+      decorators: [Owner(COMMENT_ENTITY, 'db_author_id')],
     },
   },
   params: {
@@ -39,10 +41,26 @@ import {
   },
 })
 export class CommentsController implements CrudController<Comment> {
-  constructor(public service: CommentsService) {}
+  constructor(
+    public service: CommentsService,
+    private readonly reactionsService: ReactionsService,
+  ) {}
 
   @Post()
   create(@Body() dto: CreateCommentDto, @JwtPayload() { id }: JwtPayloadType) {
     return this.service.create(id, dto);
+  }
+
+  @Post(':id/reaction')
+  reaction(
+    @Param('id') id: string,
+    @Body() { type }: CreateReactionDto,
+    @JwtPayload() { id: userId }: JwtPayloadType,
+  ) {
+    return this.reactionsService.reaction({
+      user_id: +userId,
+      comment_id: +id,
+      type,
+    });
   }
 }

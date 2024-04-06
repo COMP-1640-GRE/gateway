@@ -60,6 +60,9 @@ import { ReactionsService } from 'src/reactions/reactions.service';
       reviews: {
         eager: true,
       },
+      'reviews.reviewer': {
+        eager: true,
+      },
       db_author: {
         eager: true,
       },
@@ -124,8 +127,12 @@ export class ContributionsController implements CrudController<Contribution> {
   }
 
   @Override('getOneBase')
-  findOne(@ParsedRequest() req: CrudRequest, @Fingerprint() fp: IFingerprint) {
-    return this.service.findOneById(req, fp.id);
+  findOne(
+    @ParsedRequest() req: CrudRequest,
+    @JwtPayload() { id: userId }: JwtPayloadType,
+    @Fingerprint() fp: IFingerprint,
+  ) {
+    return this.service.findOneById(req, userId, fp.id);
   }
 
   @Patch('select-multiple')

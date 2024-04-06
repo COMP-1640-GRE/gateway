@@ -6,9 +6,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CrudRequest } from '@nestjsx/crud';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Cache } from 'cache-manager';
 import { AttachmentsService } from 'src/attachments/attachments.service';
+import { CommentsService } from 'src/comments/comments.service';
 import { Semester } from 'src/semesters/entities/semester.entity';
 import { SemestersService } from 'src/semesters/semesters.service';
 import { UsersService } from 'src/users/users.service';
@@ -23,8 +25,6 @@ import {
   Contribution,
   ContributionStatus,
 } from './entities/contribution.entity';
-import { CommentsService } from 'src/comments/comments.service';
-import { CrudRequest } from '@nestjsx/crud';
 
 const VIEW_CACHE_TIME = 5 * 60 * 1000;
 
@@ -50,11 +50,11 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
   ) {
     const attachmentsDto = this.attachmentsService.validate(attachments);
     const semester = await this.getValidSemester(dto.semester_id);
-    const student = await this.getValidStudent(userId, semester);
+    const db_author = await this.getValidStudent(userId, semester);
 
     const contribution = await this.contributionsRepository.save({
       ...dto,
-      student,
+      db_author,
       semester,
     });
 
@@ -68,7 +68,7 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     return contribution;
   }
 
-  async findOneById(req: CrudRequest, fingerprint: string) {
+  async findOneById(req: CrudRequest, userId: number, fingerprint: string) {
     const contribution = await this.getOne(req);
 
     if (!contribution) {

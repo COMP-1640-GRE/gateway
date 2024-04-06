@@ -1,7 +1,7 @@
 import { Exclude, Expose } from 'class-transformer';
 import { Attachment } from 'src/attachments/entities/attachment.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
-import { Reaction } from 'src/reactions/entities/reaction.entity';
+import { Reaction, ReactionType } from 'src/reactions/entities/reaction.entity';
 import { Review } from 'src/reviews/entities/review.entity';
 import { Semester } from 'src/semesters/entities/semester.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -81,8 +81,32 @@ export class Contribution extends BaseEntity {
   @OneToMany(() => Reaction, (reaction) => reaction.contribution)
   reactions: Reaction[];
 
+  @Expose()
+  get reaction() {
+    return this.reactions?.reduce(
+      (acc, curr) => {
+        Object.values(ReactionType).forEach((type) => {
+          if (curr.type === type) {
+            acc[type] = acc[type] + 1;
+          }
+        });
+
+        return acc;
+      },
+      {
+        like: 0,
+        dislike: 0,
+      },
+    );
+  }
+
   @OneToMany(() => Comment, (comment) => comment.contribution)
   comments: Comment[];
+
+  @Expose()
+  get comment_count() {
+    return this.comments?.length;
+  }
 
   constructor(partial: Partial<Contribution>) {
     super();

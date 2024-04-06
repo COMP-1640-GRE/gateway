@@ -9,34 +9,6 @@ export const mapContributions = (
 ) => {
   const reactionType = Object.values(ReactionType);
 
-  contributions = contributions.map((contribution) => {
-    const reaction = contribution.reactions.reduce(
-      (acc, curr) => {
-        if (curr.user.id === userId) {
-          acc.reacted = curr.type;
-        }
-
-        reactionType.forEach((type) => {
-          if (curr.type === type) {
-            acc[type] = acc[type] + 1;
-          }
-        });
-
-        return acc;
-      },
-      {
-        like: 0,
-        dislike: 0,
-        reacted: null,
-      },
-    );
-
-    contribution['reaction'] = reaction;
-    contribution['comment_count'] = contribution.comments.length;
-
-    return contribution;
-  });
-
   sorts.forEach((sort) => {
     const { field, order } = sort;
 
