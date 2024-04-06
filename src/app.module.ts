@@ -20,6 +20,8 @@ import { UsersModule } from './users/users.module';
 import { ReactionsModule } from './reactions/reactions.module';
 import { CommentsModule } from './comments/comments.module';
 import { SystemsModule } from './systems/systems.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -54,6 +56,8 @@ import { SystemsModule } from './systems/systems.module';
     ReactionsModule,
     CommentsModule,
     SystemsModule,
+    NotificationsModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [
