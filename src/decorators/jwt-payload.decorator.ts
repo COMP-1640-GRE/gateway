@@ -1,4 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { Faculty } from 'src/faculties/entities/faculty.entity';
 import { AccountStatus, UserRole } from 'src/users/entities/user.entity';
 
 export const JwtPayload = createParamDecorator(
@@ -17,6 +18,6 @@ export type JwtPayloadType = {
   email?: string;
   first_name?: string;
   last_name?: string;
-  faculty_id?: number;
+  faculty?: Faculty;
   avatar?: string;
 };

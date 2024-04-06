@@ -33,6 +33,9 @@ export class Comment extends BaseEntity {
   @Column({ default: false })
   is_anonymous: boolean;
 
+  @Column({ default: false })
+  blocked: boolean;
+
   @ManyToOne(() => Contribution, (contribution) => contribution.comments, {
     onDelete: 'CASCADE',
     nullable: true,

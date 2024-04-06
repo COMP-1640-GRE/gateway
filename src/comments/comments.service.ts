@@ -4,20 +4,31 @@ import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { TreeRepository } from 'typeorm';
 import { CreateCommentDto } from './dto/comment.dto';
 import { Comment } from './entities/comment.entity';
+import { SystemsService } from 'src/systems/systems.service';
 
 @Injectable()
 export class CommentsService extends TypeOrmCrudService<Comment> {
   constructor(
     @InjectRepository(Comment)
     private commentRepository: TreeRepository<Comment>,
+    private readonly systemsService: SystemsService,
   ) {
     super(commentRepository);
   }
 
-  async create(userId: number, dto: CreateCommentDto) {
+  async create(userId: number, dto: CreateCommentDto, facultyId?: number) {
     const { contribution_id, parent_id, ...rest } = dto;
     if (!contribution_id && !parent_id) {
       throw new BadRequestException('Comment must have contribution or parent');
+    }
+
+    const blockedWords = await this.systemsService.getFacultyBlockedWords(
+      facultyId,
+    );
+    let blocked = false;
+
+    if (blockedWords.some((word) => rest.content.includes(word))) {
+      blocked = true;
     }
 
     const contribution = contribution_id ? { id: contribution_id } : null;
@@ -32,10 +43,11 @@ export class CommentsService extends TypeOrmCrudService<Comment> {
     }
 
     return this.commentRepository.save({
+      ...rest,
       parent,
       contribution,
       db_author: { id: userId },
-      ...rest,
+      blocked,
     });
   }
 

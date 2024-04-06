@@ -1,0 +1,10 @@
+{
+  "blocked_words": ["dummy", "spam", "scam"],
+  "notifications": {
+    "enabled": true,
+    "send_mail": true
+  },
+  "attachments": {
+    "max_size": 10485760
+  }
+}

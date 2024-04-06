@@ -16,4 +16,10 @@ export class Faculty extends BaseEntity {
 
   @OneToMany(() => Semester, (semester) => semester.faculty)
   semesters: Semester[];
+
+  @Column('text', { array: true, default: [] })
+  blocked_words: string[];
+
+  @Column('text', { array: true, default: [] })
+  guest_resource: string[];
 }

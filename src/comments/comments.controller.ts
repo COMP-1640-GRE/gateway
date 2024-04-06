@@ -47,8 +47,11 @@ export class CommentsController implements CrudController<Comment> {
   ) {}
 
   @Post()
-  create(@Body() dto: CreateCommentDto, @JwtPayload() { id }: JwtPayloadType) {
-    return this.service.create(id, dto);
+  create(
+    @Body() dto: CreateCommentDto,
+    @JwtPayload() { id, faculty }: JwtPayloadType,
+  ) {
+    return this.service.create(id, dto, faculty?.id);
   }
 
   @Post(':id/reaction')

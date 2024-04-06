@@ -19,6 +19,7 @@ import { SemestersModule } from './semesters/semesters.module';
 import { UsersModule } from './users/users.module';
 import { ReactionsModule } from './reactions/reactions.module';
 import { CommentsModule } from './comments/comments.module';
+import { SystemsModule } from './systems/systems.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { CommentsModule } from './comments/comments.module';
     ReviewsModule,
     ReactionsModule,
     CommentsModule,
+    SystemsModule,
   ],
   controllers: [],
   providers: [
