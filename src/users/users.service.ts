@@ -15,16 +15,16 @@ import {
 import { AccountStatus, User, UserRole } from './entities/user.entity';
 import { isAlphanumeric } from 'class-validator';
 import { AttachmentsService } from 'src/attachments/attachments.service';
+import { SystemsService } from 'src/systems/systems.service';
 
 @Injectable()
 export class UsersService extends TypeOrmCrudService<User> {
-  private defaultPassword = process.env.DEFAULT_PASSWORD || '1234@Abcd';
-
   constructor(
     @InjectRepository(User)
     public usersRepository: Repository<User>,
     private facultiesService: FacultiesService,
     private attachmentsService: AttachmentsService,
+    private systemsService: SystemsService,
   ) {
     super(usersRepository);
     // check if users table is empty
@@ -38,7 +38,7 @@ export class UsersService extends TypeOrmCrudService<User> {
           role: UserRole.ADMINISTRATOR,
         }).then(() => {
           Logger.log(
-            `'Administrator user created with username: ${usernames} and password: ${this.defaultPassword}`,
+            `'Administrator user created with username: ${usernames} and password: ${this.systemsService.config.user.default_password}`,
           );
         });
       }
@@ -91,7 +91,10 @@ export class UsersService extends TypeOrmCrudService<User> {
         );
       }
     }
-    const password = await bcrypt.hash(this.defaultPassword, 10);
+    const password = await bcrypt.hash(
+      this.systemsService.config.user.default_password,
+      10,
+    );
     // Hash the passwords
     const usersToCreate = await Promise.all(
       usernamesArray.map(async (username) => ({
@@ -220,7 +223,10 @@ export class UsersService extends TypeOrmCrudService<User> {
       throw new BadRequestException(`User with id ${id} not found`);
     }
 
-    const password = await bcrypt.hash(this.defaultPassword, 10);
+    const password = await bcrypt.hash(
+      this.systemsService.config.user.default_password,
+      10,
+    );
     return this.usersRepository.update(id, {
       password,
       secret: nanoid(),

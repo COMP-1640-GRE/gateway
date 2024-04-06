@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ContributionsService } from './contributions.service';
-import { ContributionsController } from './contributions.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Contribution } from './entities/contribution.entity';
 import { AttachmentsModule } from 'src/attachments/attachments.module';
+import { CommentsModule } from 'src/comments/comments.module';
+import { ReactionsModule } from 'src/reactions/reactions.module';
 import { SemestersModule } from 'src/semesters/semesters.module';
 import { UsersModule } from 'src/users/users.module';
-import { ReactionsModule } from 'src/reactions/reactions.module';
-import { CommentsModule } from 'src/comments/comments.module';
+import { ContributionsController } from './contributions.controller';
+import { ContributionsService } from './contributions.service';
+import { Contribution } from './entities/contribution.entity';
 
 @Module({
   imports: [

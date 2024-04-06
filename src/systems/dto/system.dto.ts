@@ -1,10 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsPositive } from 'class-validator';
+import { IsBoolean } from 'class-validator';
 
 export class SystemDto {
   notifications: NotificationsConfig;
-
-  attachments: AttachmentsConfig;
 }
 
 export class NotificationsConfig {
@@ -15,9 +13,4 @@ export class NotificationsConfig {
   @ApiProperty()
   @IsBoolean()
   send_mail: boolean;
-}
-export class AttachmentsConfig {
-  @ApiProperty()
-  @IsPositive()
-  max_size: number;
 }
