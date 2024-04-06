@@ -34,5 +34,3 @@ import { Attachment } from './entities/attachment.entity';
   exports: [AttachmentsService],
 })
 export class AttachmentsModule {}
-// TODO: Attachments module is call gRPC service
-// https://docs.nestjs.com/microservices/grpc#client
