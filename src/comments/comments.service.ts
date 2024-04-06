@@ -27,7 +27,11 @@ export class CommentsService extends TypeOrmCrudService<Comment> {
     );
     let blocked = false;
 
-    if (blockedWords.some((word) => rest.content.includes(word))) {
+    if (
+      blockedWords.some((word) =>
+        rest.content.toLowerCase().includes(word.toLowerCase()),
+      )
+    ) {
       blocked = true;
     }
 

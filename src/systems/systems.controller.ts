@@ -1,4 +1,11 @@
-import { Body, Controller, Get, NotFoundException, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
   JwtPayload,
@@ -8,6 +15,8 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
 import { SystemDto } from './dto/system.dto';
 import { SystemsService } from './systems.service';
+
+const RESOURCES = ['resource 1', 'resource 2', 'resource 3'];
 
 @ApiTags('systems')
 @Controller('systems')
@@ -53,14 +62,36 @@ export class SystemsController {
     }
   }
 
-  @Post('config')
+  @Get('config')
+  @Roles(UserRole.ADMINISTRATOR)
+  getConfig() {
+    const { blocked_words, ...config } = this.systemsService.config;
+
+    return config;
+  }
+
+  @Patch('config')
   @Roles(UserRole.ADMINISTRATOR)
   updateConfig(@Body() dto: SystemDto) {
-    return {};
+    return this.systemsService.updateConfigs(dto);
+  }
+
+  @Get('available-guest-resources')
+  getAvailableGuestResources() {
+    return RESOURCES;
   }
 
   @Get('guest-resources')
-  getAvailableGuestResources() {
-    return this.systemsService.config.blocked_words;
+  getGuestResources(@JwtPayload() { faculty }: JwtPayloadType) {
+    return this.systemsService.getFacultyGuestResources(faculty?.id);
+  }
+
+  @Post('guest-resources')
+  @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
+  updateGuestResources(
+    @JwtPayload() { faculty }: JwtPayloadType,
+    @Body() words: string[],
+  ) {
+    return this.systemsService.updateGuestResources(faculty?.id, words);
   }
 }

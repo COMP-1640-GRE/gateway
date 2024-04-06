@@ -1,24 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsBoolean, IsPositive } from 'class-validator';
 
-export class BlockedWordsDto {
-  @ApiProperty({
-    type: [String],
-    example: ['word1', 'word2', 'word3'],
-    description: 'List of blocked words',
-  })
-  @IsString({ each: true })
-  blockedWords: string[];
+export class SystemDto {
+  notifications: NotificationsConfig;
+
+  attachments: AttachmentsConfig;
 }
 
-export class GuestResourceDto {
-  @ApiProperty({
-    type: [String],
-    example: ['word1', 'word2', 'word3'],
-    description: 'List of resources for guest users',
-  })
-  @IsString({ each: true })
-  guestResources: string[];
-}
+export class NotificationsConfig {
+  @ApiProperty()
+  @IsBoolean()
+  enabled: boolean;
 
-export class SystemDto {}
+  @ApiProperty()
+  @IsBoolean()
+  send_mail: boolean;
+}
+export class AttachmentsConfig {
+  @ApiProperty()
+  @IsPositive()
+  max_size: number;
+}
