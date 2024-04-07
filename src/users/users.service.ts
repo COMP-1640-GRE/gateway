@@ -301,7 +301,7 @@ export class UsersService extends TypeOrmCrudService<User> {
     await this.cacheManager.set(
       this.getForgotPasswordKey(user.id),
       code,
-      5 * 60 * 1000,
+      1 * 60 * 60 * 1000,
     );
 
     await this.notificationsService.queueNotify({
