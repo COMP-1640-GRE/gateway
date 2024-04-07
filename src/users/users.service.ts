@@ -1,3 +1,4 @@
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
   Inject,
@@ -7,9 +8,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import * as bcrypt from 'bcrypt';
+import { Cache } from 'cache-manager';
+import { isAlphanumeric } from 'class-validator';
 import { nanoid } from 'nanoid';
+import { AttachmentsService } from 'src/attachments/attachments.service';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
 import { FacultiesService } from 'src/faculties/faculties.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { SystemsService } from 'src/systems/systems.service';
 import { Repository } from 'typeorm';
 import {
   AdminUpdateUserDto,
@@ -18,12 +24,6 @@ import {
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
 import { AccountStatus, User, UserRole } from './entities/user.entity';
-import { isAlphanumeric } from 'class-validator';
-import { AttachmentsService } from 'src/attachments/attachments.service';
-import { SystemsService } from 'src/systems/systems.service';
-import { NotificationsService } from 'src/notifications/notifications.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UsersService extends TypeOrmCrudService<User> {
@@ -304,12 +304,14 @@ export class UsersService extends TypeOrmCrudService<User> {
       5 * 60 * 1000,
     );
 
-    return this.notificationsService.queueNotify({
+    await this.notificationsService.queueNotify({
       userId: user.id,
       templateCode: 'reset_pw_email',
       option: code,
       sendMail: true,
     });
+
+    return { message: 'Code sent successfully' };
   }
 
   async userResetPassword(
