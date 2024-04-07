@@ -91,8 +91,6 @@ export class AuthService {
     const cookieOptions: CookieOptions = {
       secure: true,
       sameSite: 'none',
-      // httpOnly: true,
-      // domain: process.env.FRONTEND_URL || 'localhost',
     };
 
     res.cookie(TOKEN_KEY, access_token, cookieOptions);
@@ -137,5 +135,19 @@ export class AuthService {
       password: new_password,
       remember,
     });
+  }
+
+  async logout(res: Response) {
+    const cookieOptions: CookieOptions = {
+      secure: true,
+      sameSite: 'none',
+    };
+
+    res.clearCookie(TOKEN_KEY, cookieOptions);
+    res.clearCookie(REFRESH_TOKEN_KEY, cookieOptions);
+
+    return {
+      success: true,
+    };
   }
 }

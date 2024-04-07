@@ -8,7 +8,6 @@ import {
 import { Public } from 'src/decorators/public.decorator';
 import { AuthService } from './auth.service';
 import { ActiveAccountDto, LoginDto } from './dto/auth.dto';
-import { REFRESH_TOKEN_KEY, TOKEN_KEY } from './jwt.strategy';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -35,10 +34,7 @@ export class AuthController {
 
   @Get('logout')
   logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie(TOKEN_KEY);
-    res.clearCookie(REFRESH_TOKEN_KEY);
-
-    return { message: 'Logged out' };
+    return this.authService.logout(res);
   }
 
   @Get('introspect')

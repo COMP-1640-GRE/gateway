@@ -36,7 +36,7 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
   }
 
   queueNotify(notify: NotifyType) {
-    return this.notificationQueue.add(notify, {});
+    return this.notificationQueue.add(notify, { removeOnComplete: true });
   }
 
   async notify({
