@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bull';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -6,24 +7,25 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NestjsFingerprintModule } from 'nestjs-fingerprint';
 import { join } from 'path';
+import { RedisClientOptions } from 'redis';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/jwt.guard';
 import { OwnerGuard } from './auth/owner.guard';
 import { RolesGuard } from './auth/roles.guard';
-import { ContributionsModule } from './contributions/contributions.module';
-import { FacultiesModule } from './faculties/faculties.module';
-import { ReviewsModule } from './reviews/reviews.module';
-import { SemestersModule } from './semesters/semesters.module';
-import { UsersModule } from './users/users.module';
-import { ReactionsModule } from './reactions/reactions.module';
 import { CommentsModule } from './comments/comments.module';
-import { SystemsModule } from './systems/systems.module';
-import { NotificationsModule } from './notifications/notifications.module';
+import { ContributionsModule } from './contributions/contributions.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { EventsModule } from './events/events.module';
-import { BullModule } from '@nestjs/bull';
+import { FacultiesModule } from './faculties/faculties.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ReactionsModule } from './reactions/reactions.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { SemestersModule } from './semesters/semesters.module';
+import { SystemsModule } from './systems/systems.module';
+import { UsersModule } from './users/users.module';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
@@ -31,7 +33,11 @@ import { BullModule } from '@nestjs/bull';
       envFilePath: '.env',
       isGlobal: true,
     }),
-    CacheModule.register({ isGlobal: true }),
+    CacheModule.register<RedisClientOptions>({
+      isGlobal: true,
+      store: redisStore,
+      url: `redis://${process.env.REDIS_USER}:${process.env.REDIS_PASS}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+    }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
