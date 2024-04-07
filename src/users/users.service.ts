@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import * as bcrypt from 'bcrypt';
@@ -16,6 +21,9 @@ import { AccountStatus, User, UserRole } from './entities/user.entity';
 import { isAlphanumeric } from 'class-validator';
 import { AttachmentsService } from 'src/attachments/attachments.service';
 import { SystemsService } from 'src/systems/systems.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UsersService extends TypeOrmCrudService<User> {
@@ -25,6 +33,9 @@ export class UsersService extends TypeOrmCrudService<User> {
     private facultiesService: FacultiesService,
     private attachmentsService: AttachmentsService,
     private systemsService: SystemsService,
+    private notificationsService: NotificationsService,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
   ) {
     super(usersRepository);
     // check if users table is empty
@@ -91,9 +102,8 @@ export class UsersService extends TypeOrmCrudService<User> {
         );
       }
     }
-    const password = await bcrypt.hash(
+    const password = await this.hashPassword(
       this.systemsService.config.user.default_password,
-      10,
     );
     // Hash the passwords
     const usersToCreate = await Promise.all(
@@ -102,7 +112,7 @@ export class UsersService extends TypeOrmCrudService<User> {
         role,
         faculty,
         password,
-        secret: nanoid(),
+        secret: this.generateSecret(),
       })),
     );
 
@@ -212,7 +222,7 @@ export class UsersService extends TypeOrmCrudService<User> {
       throw new BadRequestException('Incorrect password');
     }
 
-    const hashedPassword = await bcrypt.hash(new_password, 10);
+    const hashedPassword = await this.hashPassword(new_password);
 
     return this.usersRepository.update(id, { password: hashedPassword });
   }
@@ -223,13 +233,13 @@ export class UsersService extends TypeOrmCrudService<User> {
       throw new BadRequestException(`User with id ${id} not found`);
     }
 
-    const password = await bcrypt.hash(
+    const password = await this.hashPassword(
       this.systemsService.config.user.default_password,
-      10,
     );
+
     return this.usersRepository.update(id, {
       password,
-      secret: nanoid(),
+      secret: this.generateSecret(),
       account_status: AccountStatus.INACTIVE,
     });
   }
@@ -266,5 +276,70 @@ export class UsersService extends TypeOrmCrudService<User> {
 
     await this.usersRepository.update(id, { avatar: avatar.path });
     return avatar;
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException(`User with email ${email} not found`);
+    }
+
+    const code = nanoid(6);
+
+    await this.cacheManager.set(
+      this.getForgotPasswordKey(user.id),
+      code,
+      5 * 60 * 1000,
+    );
+
+    return this.notificationsService.notify({
+      userId: user.id,
+      templateCode: 'reset_pw_email',
+      option: code,
+      sendMail: true,
+    });
+  }
+
+  async userResetPassword(
+    email: string,
+    { code, password }: { code: string; password: string },
+  ) {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException(`User with email ${email} not found`);
+    }
+    const key = this.getForgotPasswordKey(user.id);
+    const cachedCode = await this.cacheManager.get(key);
+
+    if (!cachedCode) {
+      throw new BadRequestException('Code has expired');
+    }
+
+    if (cachedCode !== code) {
+      throw new BadRequestException('Invalid code');
+    }
+
+    const hashedPassword = await this.hashPassword(password);
+
+    await this.usersRepository.update(user.id, {
+      password: hashedPassword,
+      secret: this.generateSecret(),
+    });
+
+    await this.cacheManager.del(key);
+
+    return { message: 'Password reset successfully' };
+  }
+
+  private getForgotPasswordKey(id: number) {
+    return `forgot_password-${id}`;
+  }
+
+  private generateSecret() {
+    return nanoid();
+  }
+
+  private hashPassword(password: string) {
+    return bcrypt.hash(password, 10);
   }
 }

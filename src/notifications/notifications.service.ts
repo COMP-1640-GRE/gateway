@@ -7,6 +7,7 @@ import { ClientGrpc } from '@nestjs/microservices';
 import { SystemsService } from 'src/systems/systems.service';
 import { lastValueFrom } from 'rxjs';
 import { EventsService } from 'src/events/events.service';
+import { TemplateCode } from './types';
 
 @Injectable()
 export class NotificationsService extends TypeOrmCrudService<Notification> {
@@ -23,7 +24,7 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
   }
 
   onModuleInit() {
-    this.emailService = this.client.getService('NotificationService');
+    this.emailService = this.client.getService('Notification');
   }
 
   async notify({
@@ -33,7 +34,7 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
     option,
   }: {
     userId: number;
-    templateCode: string;
+    templateCode: TemplateCode;
     sendMail?: boolean;
     option?: string;
   }) {
@@ -41,14 +42,11 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
     if (!enabled) {
       return;
     }
-    this.eventsService.publish(String(userId), {
-      type: 'notification',
-      data: templateCode,
-    });
 
-    const withEmail = sendMail && send_mail;
+    const withEmail =
+      templateCode === 'reset_pw_email' ? true : sendMail && send_mail;
 
-    return lastValueFrom<any>(
+    const res = await lastValueFrom<any>(
       this.emailService.sendNotification({
         templateCode,
         userId,
@@ -56,6 +54,13 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
         withEmail,
       }),
     );
+
+    this.eventsService.publish(String(userId), {
+      type: 'notification',
+      data: res?.content,
+    });
+
+    return res;
   }
 
   event(userId: string, data?: any) {

@@ -20,11 +20,14 @@ import {
   AdminUpdateUserDto,
   ChangePasswordDto,
   CreateUsersDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
   UpdateUserDto,
   UploadAvatarDto,
 } from './dto/user.dto';
 import { USER_ENTITY, User, UserRole } from './entities/user.entity';
 import { UsersService } from './users.service';
+import { Public } from 'src/decorators/public.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -99,9 +102,17 @@ export class UsersController implements CrudController<User> {
     return this.service.changePassword(+id, dto);
   }
 
-  // TODO: send email or send a notification to the administrator to reset the password
-  // @Post('forgot-password')
-  // forgotPassword
+  @Public()
+  @Post('forgot-password')
+  forgotPassword(@Body() { email }: ForgotPasswordDto) {
+    return this.service.forgotPassword(email);
+  }
+
+  @Public()
+  @Post('reset-password')
+  userResetPassword(@Body() { email, code, password }: ResetPasswordDto) {
+    return this.service.userResetPassword(email, { code, password });
+  }
 
   @Patch(':id/reset-password')
   @Roles(UserRole.ADMINISTRATOR)

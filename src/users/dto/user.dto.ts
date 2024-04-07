@@ -115,3 +115,30 @@ export class UploadAvatarDto {
   @ApiProperty({ type: 'string', format: 'binary' })
   file: Express.Multer.File;
 }
+
+export class ForgotPasswordDto {
+  @IsEmail()
+  @IsOptional()
+  @MinLength(1)
+  @MaxLength(100)
+  @ApiProperty({ example: 'user@example.com', required: false })
+  email: string;
+}
+
+export class ResetPasswordDto extends ForgotPasswordDto {
+  @IsString()
+  @ApiProperty({ example: '123456' })
+  code: string;
+
+  @IsString()
+  @IsStrongPassword({
+    minLength: 8,
+    minNumbers: 1,
+    minSymbols: 1,
+    minUppercase: 1,
+    minLowercase: 1,
+  })
+  @MaxLength(64)
+  @ApiProperty({ example: 'superSecure@12' })
+  password: string;
+}

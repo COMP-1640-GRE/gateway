@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { NotificationsController } from './notifications.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,6 +10,7 @@ import { ChannelCredentials } from '@grpc/grpc-js';
 import { SystemsModule } from 'src/systems/systems.module';
 import { EventsModule } from 'src/events/events.module';
 
+@Global()
 @Module({
   imports: [
     EventsModule,
@@ -23,8 +24,8 @@ import { EventsModule } from 'src/events/events.module';
           transport: Transport.GRPC,
           options: {
             url: configService.get<string>('FILE_TRANSFER_PACKAGE_URL'),
-            package: 'com.example.grpctest1',
-            protoPath: join(__dirname, '../proto/notificationService.proto'),
+            package: 'notification',
+            protoPath: join(__dirname, '../proto/notification.proto'),
             loader: { keepCase: true },
             credentials: ChannelCredentials.createSsl(),
           },
