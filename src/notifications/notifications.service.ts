@@ -1,15 +1,15 @@
+import { InjectQueue } from '@nestjs/bull';
 import { Inject, Injectable } from '@nestjs/common';
-import { Notification } from './entities/notification.entity';
-import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { ClientGrpc } from '@nestjs/microservices';
-import { SystemsService } from 'src/systems/systems.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { Queue } from 'bull';
 import { lastValueFrom } from 'rxjs';
 import { EventsService } from 'src/events/events.service';
-import { NotifyType, TemplateCode } from './types';
-import { InjectQueue } from '@nestjs/bull';
-import { Queue } from 'bull';
+import { SystemsService } from 'src/systems/systems.service';
+import { Repository } from 'typeorm';
+import { Notification } from './entities/notification.entity';
+import { NotifyType } from './types';
 
 @Injectable()
 export class NotificationsService extends TypeOrmCrudService<Notification> {
@@ -35,11 +35,16 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
     this.emailService = this.client.getService('Notification');
   }
 
-  async queueNotify(notify: NotifyType) {
+  queueNotify(notify: NotifyType) {
     return this.notificationQueue.add(notify, {});
   }
 
-  async notify({ userId, templateCode, sendMail = true, option }: NotifyType) {
+  async notify({
+    userId,
+    templateCode,
+    sendMail = false,
+    option = '',
+  }: NotifyType) {
     const { enabled, send_mail } = this.systemsService.config.notifications;
     if (!enabled) {
       return;
@@ -51,7 +56,7 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
     const res = await lastValueFrom<any>(
       this.emailService.sendNotification({
         templateCode,
-        userId,
+        userId: String(userId),
         option,
         withEmail,
       }),

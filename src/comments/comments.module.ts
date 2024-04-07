@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
-import { CommentsService } from './comments.service';
-import { CommentsController } from './comments.controller';
-import { Comment } from './entities/comment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReactionsModule } from 'src/reactions/reactions.module';
 import { SystemsModule } from 'src/systems/systems.module';
+import { CommentsController } from './comments.controller';
+import { CommentsService } from './comments.service';
+import { Comment } from './entities/comment.entity';
+import { Contribution } from 'src/contributions/entities/contribution.entity';
 
 @Module({
   imports: [
     SystemsModule,
     ReactionsModule,
-    TypeOrmModule.forFeature([Comment]),
+    TypeOrmModule.forFeature([Comment, Contribution]),
   ],
   controllers: [CommentsController],
   providers: [CommentsService],

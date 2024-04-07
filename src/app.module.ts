@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { redisStore } from 'cache-manager-redis-yet';
 import { NestjsFingerprintModule } from 'nestjs-fingerprint';
 import { join } from 'path';
 import { RedisClientOptions } from 'redis';
@@ -25,7 +26,6 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { SemestersModule } from './semesters/semesters.module';
 import { SystemsModule } from './systems/systems.module';
 import { UsersModule } from './users/users.module';
-import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [

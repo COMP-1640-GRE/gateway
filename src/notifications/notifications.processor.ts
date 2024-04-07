@@ -7,7 +7,11 @@ export class NotificationsProcessor {
   constructor(private readonly notificationsService: NotificationsService) {}
 
   @Process()
-  handleJob(job: Job) {
-    return this.notificationsService.notify(job.data);
+  async handleJob(job: Job) {
+    try {
+      await this.notificationsService.notify(job.data);
+    } catch (error) {
+      console.warn(error);
+    }
   }
 }

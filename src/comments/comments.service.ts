@@ -5,15 +5,22 @@ import { TreeRepository } from 'typeorm';
 import { CreateCommentDto } from './dto/comment.dto';
 import { Comment } from './entities/comment.entity';
 import { SystemsService } from 'src/systems/systems.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { Contribution } from 'src/contributions/entities/contribution.entity';
 
 @Injectable()
 export class CommentsService extends TypeOrmCrudService<Comment> {
   constructor(
     @InjectRepository(Comment)
-    private commentRepository: TreeRepository<Comment>,
+    private commentsRepository: TreeRepository<Comment>,
+
+    @InjectRepository(Contribution)
+    private contributionsRepository: TreeRepository<Contribution>,
+
     private readonly systemsService: SystemsService,
+    private readonly notificationsService: NotificationsService,
   ) {
-    super(commentRepository);
+    super(commentsRepository);
   }
 
   async create(userId: number, dto: CreateCommentDto, facultyId?: number) {
@@ -35,18 +42,33 @@ export class CommentsService extends TypeOrmCrudService<Comment> {
       blocked = true;
     }
 
-    const contribution = contribution_id ? { id: contribution_id } : null;
+    const contribution = await this.contributionsRepository.findOne(
+      contribution_id,
+      {
+        relations: ['db_author'],
+      },
+    );
+
+    if (!contribution) {
+      throw new BadRequestException('Contribution not found');
+    }
+
     let parent: Comment = null;
 
     if (parent_id) {
-      parent = await this.commentRepository.findOne(parent_id);
+      parent = await this.commentsRepository.findOne(parent_id);
 
       if (!parent) {
         throw new BadRequestException('Parent comment not found');
       }
     }
 
-    return this.commentRepository.save({
+    await this.notificationsService.queueNotify({
+      userId: contribution.db_author.id,
+      templateCode: 'std03_noti',
+    });
+
+    return this.commentsRepository.save({
       ...rest,
       parent,
       contribution,
@@ -56,14 +78,14 @@ export class CommentsService extends TypeOrmCrudService<Comment> {
   }
 
   async getComments(contributionId: number) {
-    const rootComments = await this.commentRepository.find({
+    const rootComments = await this.commentsRepository.find({
       where: { contribution: { id: contributionId }, parent: null },
       relations: ['db_author', 'reactions', 'reactions.user'],
     });
 
     const rootCommentsWithChildren = await Promise.all(
       rootComments.map(async (rootComment) =>
-        this.commentRepository.findDescendantsTree(rootComment, {
+        this.commentsRepository.findDescendantsTree(rootComment, {
           relations: ['db_author', 'reactions', 'reactions.user'],
         }),
       ),
