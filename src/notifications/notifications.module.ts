@@ -9,6 +9,8 @@ import { join } from 'path';
 import { ChannelCredentials } from '@grpc/grpc-js';
 import { SystemsModule } from 'src/systems/systems.module';
 import { EventsModule } from 'src/events/events.module';
+import { BullModule } from '@nestjs/bull';
+import { NotificationsProcessor } from './notifications.processor';
 
 @Global()
 @Module({
@@ -16,6 +18,7 @@ import { EventsModule } from 'src/events/events.module';
     EventsModule,
     SystemsModule,
     TypeOrmModule.forFeature([Notification]),
+    BullModule.registerQueue({ name: 'NOTIFICATION' }),
     ClientsModule.registerAsync([
       {
         name: 'NOTIFICATION_PACKAGE',
@@ -35,7 +38,7 @@ import { EventsModule } from 'src/events/events.module';
     ]),
   ],
   controllers: [NotificationsController],
-  providers: [NotificationsService],
+  providers: [NotificationsService, NotificationsProcessor],
   exports: [NotificationsService],
 })
 export class NotificationsModule {}

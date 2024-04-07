@@ -23,6 +23,7 @@ import { SystemsModule } from './systems/systems.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { EventsModule } from './events/events.module';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -46,6 +47,16 @@ import { EventsModule } from './events/events.module';
     }),
     NestjsFingerprintModule.forRoot({
       params: ['headers', 'userAgent', 'ipAddress'],
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
+        password: process.env.REDIS_PASS,
+        db: parseInt(process.env.REDIS_DB),
+        name: process.env.REDIS_NAME,
+        username: process.env.REDIS_USER,
+      },
     }),
     AuthModule,
     UsersModule,

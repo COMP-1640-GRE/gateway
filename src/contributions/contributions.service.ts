@@ -11,6 +11,7 @@ import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Cache } from 'cache-manager';
 import { AttachmentsService } from 'src/attachments/attachments.service';
 import { CommentsService } from 'src/comments/comments.service';
+import { NotificationsService } from 'src/notifications/notifications.service';
 import { Semester } from 'src/semesters/entities/semester.entity';
 import { SemestersService } from 'src/semesters/semesters.service';
 import { UsersService } from 'src/users/users.service';
@@ -37,6 +38,7 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     private readonly semestersService: SemestersService,
     private readonly attachmentsService: AttachmentsService,
     private readonly commentsService: CommentsService,
+    private readonly notificationsService: NotificationsService,
     @Inject(CACHE_MANAGER)
     private cacheManager: Cache,
   ) {
@@ -63,6 +65,29 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
     } catch (error) {
       await this.contributionsRepository.remove(contribution);
       throw error;
+    }
+
+    try {
+      await this.notificationsService.queueNotify({
+        userId,
+        templateCode: 'std01_noti',
+        sendMail: true,
+      });
+
+      const facultyCoordinators =
+        await this.usersService.getFacultyCoordinators(semester.faculty.id);
+
+      await Promise.all(
+        facultyCoordinators.map((user) =>
+          this.notificationsService.queueNotify({
+            userId: user.id,
+            templateCode: 'fac01_noti',
+            sendMail: true,
+          }),
+        ),
+      );
+    } catch (error) {
+      console.warn(error);
     }
 
     return contribution;

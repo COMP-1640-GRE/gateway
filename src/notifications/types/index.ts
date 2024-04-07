@@ -8,3 +8,10 @@ export type TemplateCode =
   | 'fac01_email'
   | 'fac01_noti'
   | 'reset_pw_email';
+
+export type NotifyType = {
+  userId: number;
+  templateCode: TemplateCode;
+  sendMail?: boolean;
+  option?: string;
+};

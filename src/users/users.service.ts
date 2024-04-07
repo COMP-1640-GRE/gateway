@@ -227,6 +227,18 @@ export class UsersService extends TypeOrmCrudService<User> {
     return this.usersRepository.update(id, { password: hashedPassword });
   }
 
+  getFacultyCoordinators(facultyId: number) {
+    return this.usersRepository.find({
+      where: {
+        role: UserRole.FACULTY_MARKETING_COORDINATOR,
+        faculty: {
+          id: facultyId,
+        },
+      },
+      relations: ['faculty'],
+    });
+  }
+
   async resetPassword(id: number) {
     const user = await this.findById(id);
     if (!user) {
@@ -292,7 +304,7 @@ export class UsersService extends TypeOrmCrudService<User> {
       5 * 60 * 1000,
     );
 
-    return this.notificationsService.notify({
+    return this.notificationsService.queueNotify({
       userId: user.id,
       templateCode: 'reset_pw_email',
       option: code,

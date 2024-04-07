@@ -7,7 +7,9 @@ import { ClientGrpc } from '@nestjs/microservices';
 import { SystemsService } from 'src/systems/systems.service';
 import { lastValueFrom } from 'rxjs';
 import { EventsService } from 'src/events/events.service';
-import { TemplateCode } from './types';
+import { NotifyType, TemplateCode } from './types';
+import { InjectQueue } from '@nestjs/bull';
+import { Queue } from 'bull';
 
 @Injectable()
 export class NotificationsService extends TypeOrmCrudService<Notification> {
@@ -16,7 +18,13 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
   constructor(
     @InjectRepository(Notification)
     private notificationsRepository: Repository<Notification>,
-    @Inject('NOTIFICATION_PACKAGE') private client: ClientGrpc,
+
+    @Inject('NOTIFICATION_PACKAGE')
+    private client: ClientGrpc,
+
+    @InjectQueue('NOTIFICATION')
+    private notificationQueue: Queue,
+
     private readonly eventsService: EventsService,
     private readonly systemsService: SystemsService,
   ) {
@@ -27,17 +35,11 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
     this.emailService = this.client.getService('Notification');
   }
 
-  async notify({
-    userId,
-    templateCode,
-    sendMail = true,
-    option,
-  }: {
-    userId: number;
-    templateCode: TemplateCode;
-    sendMail?: boolean;
-    option?: string;
-  }) {
+  async queueNotify(notify: NotifyType) {
+    return this.notificationQueue.add(notify, {});
+  }
+
+  async notify({ userId, templateCode, sendMail = true, option }: NotifyType) {
     const { enabled, send_mail } = this.systemsService.config.notifications;
     if (!enabled) {
       return;
