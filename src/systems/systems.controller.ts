@@ -7,6 +7,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { RESOURCES } from 'src/dashboard/dashboard.controller';
 import {
   JwtPayload,
   JwtPayloadType,
@@ -15,8 +16,6 @@ import { Roles } from 'src/decorators/roles.decorator';
 import { UserRole } from 'src/users/entities/user.entity';
 import { SystemDto } from './dto/system.dto';
 import { SystemsService } from './systems.service';
-
-const RESOURCES = ['resource 1', 'resource 2', 'resource 3'];
 
 @ApiTags('systems')
 @Controller('systems')

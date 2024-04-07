@@ -26,7 +26,7 @@ export class SystemsService implements OnModuleInit {
   }
 
   get config() {
-    return this._config;
+    return { ...this._config };
   }
 
   updateBlockedWords(words: string[]) {

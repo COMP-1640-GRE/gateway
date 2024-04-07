@@ -7,7 +7,7 @@ import {
 
 export const NOTIFICATION_ENTITY = 'notification';
 
-@Entity(NOTIFICATION_ENTITY)
+@Entity({ name: NOTIFICATION_ENTITY })
 export class Notification {
   @PrimaryGeneratedColumn()
   id: number;
