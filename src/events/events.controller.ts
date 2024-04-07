@@ -10,8 +10,13 @@ import { EventsService } from './events.service';
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
-  @Sse('listen')
-  sse(@JwtPayload() { id }: JwtPayloadType): Observable<MessageEvent> {
+  @Sse('notifications')
+  notification(@JwtPayload() { id }: JwtPayloadType): Observable<MessageEvent> {
     return this.eventsService.event(String(id));
+  }
+
+  @Sse('dashboard')
+  dashboard(): Observable<MessageEvent> {
+    return this.eventsService.dashboardEvent();
   }
 }

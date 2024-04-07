@@ -62,18 +62,12 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
       }),
     );
 
-    this.eventsService.publish(String(userId), {
-      type: 'notification',
-      data: res?.content,
-    });
+    this.eventsService.publish(String(userId), res);
 
     return res;
   }
 
-  event(userId: string, data?: any) {
-    return this.eventsService.publish(String(userId), {
-      type: 'dashboard',
-      data,
-    });
+  event(eventName = 'dashboard', data?: any) {
+    return this.eventsService.publish(eventName, data);
   }
 }
