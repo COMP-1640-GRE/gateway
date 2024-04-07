@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { ClientGrpc } from '@nestjs/microservices';
 import { SystemsService } from 'src/systems/systems.service';
 import { lastValueFrom } from 'rxjs';
+import { EventsService } from 'src/events/events.service';
 
 @Injectable()
 export class NotificationsService extends TypeOrmCrudService<Notification> {
@@ -15,6 +16,7 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
     @InjectRepository(Notification)
     private notificationsRepository: Repository<Notification>,
     @Inject('NOTIFICATION_PACKAGE') private client: ClientGrpc,
+    private readonly eventsService: EventsService,
     private readonly systemsService: SystemsService,
   ) {
     super(notificationsRepository);
@@ -24,12 +26,27 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
     this.emailService = this.client.getService('NotificationService');
   }
 
-  async notify(userId: number, templateCode: string, option?: any) {
-    const { enabled, send_mail: withEmail } =
-      this.systemsService.config.notifications;
+  async notify({
+    userId,
+    templateCode,
+    sendMail = true,
+    option,
+  }: {
+    userId: number;
+    templateCode: string;
+    sendMail?: boolean;
+    option?: string;
+  }) {
+    const { enabled, send_mail } = this.systemsService.config.notifications;
     if (!enabled) {
       return;
     }
+    this.eventsService.publish(String(userId), {
+      type: 'notification',
+      data: templateCode,
+    });
+
+    const withEmail = sendMail && send_mail;
 
     return lastValueFrom<any>(
       this.emailService.sendNotification({
@@ -39,5 +56,12 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
         withEmail,
       }),
     );
+  }
+
+  event(userId: string, data?: any) {
+    return this.eventsService.publish(String(userId), {
+      type: 'dashboard',
+      data,
+    });
   }
 }

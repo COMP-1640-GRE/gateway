@@ -8,9 +8,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import { ChannelCredentials } from '@grpc/grpc-js';
 import { SystemsModule } from 'src/systems/systems.module';
+import { EventsModule } from 'src/events/events.module';
 
 @Module({
   imports: [
+    EventsModule,
     SystemsModule,
     TypeOrmModule.forFeature([Notification]),
     ClientsModule.registerAsync([

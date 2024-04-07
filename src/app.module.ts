@@ -22,6 +22,7 @@ import { CommentsModule } from './comments/comments.module';
 import { SystemsModule } from './systems/systems.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     SystemsModule,
     NotificationsModule,
     DashboardModule,
+    EventsModule,
   ],
   controllers: [],
   providers: [
