@@ -53,15 +53,14 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
     const withEmail =
       templateCode === 'reset_pw_email' ? true : sendMail && send_mail;
 
-    const res = { content: 'ok' };
-    // const res = await lastValueFrom<any>(
-    //   this.emailService.sendNotification({
-    //     templateCode,
-    //     userId: String(userId),
-    //     option,
-    //     withEmail,
-    //   }),
-    // );
+    const res = await lastValueFrom<any>(
+      this.emailService.sendNotification({
+        templateCode,
+        userId: String(userId),
+        option,
+        withEmail,
+      }),
+    );
 
     this.eventsService.publish(String(userId), res);
 
