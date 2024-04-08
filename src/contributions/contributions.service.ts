@@ -83,6 +83,7 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
             userId: user.id,
             templateCode: 'fac01_noti',
             sendMail: true,
+            option: `${contribution.id}`,
           }),
         ),
       );

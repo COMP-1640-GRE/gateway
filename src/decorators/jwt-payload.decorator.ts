@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
-import { AccountStatus, UserRole } from 'src/users/entities/user.entity';
+import { UserStatus, UserRole } from 'src/users/entities/user.entity';
 
 export const JwtPayload = createParamDecorator(
   (_: string, ctx: ExecutionContext) => {
@@ -14,7 +14,7 @@ export type JwtPayloadType = {
   id: number;
   username: string;
   role: UserRole;
-  account_status: AccountStatus;
+  account_status: UserStatus;
   email?: string;
   first_name?: string;
   last_name?: string;

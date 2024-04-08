@@ -23,7 +23,7 @@ import {
   CreateUsersDto,
   CreateUsersResponseDto as UsersResponseDto,
 } from './dto/user.dto';
-import { AccountStatus, User, UserRole } from './entities/user.entity';
+import { UserStatus, User, UserRole } from './entities/user.entity';
 
 @Injectable()
 export class UsersService extends TypeOrmCrudService<User> {
@@ -161,7 +161,7 @@ export class UsersService extends TypeOrmCrudService<User> {
     if (!updatingUser) {
       throw new BadRequestException(`User with id ${id} not found`);
     }
-    if (updatingUser.account_status === AccountStatus.INACTIVE) {
+    if (updatingUser.account_status === UserStatus.INACTIVE) {
       throw new BadRequestException(`User with id ${id} is not active`);
     }
 
@@ -252,7 +252,7 @@ export class UsersService extends TypeOrmCrudService<User> {
     return this.usersRepository.update(id, {
       password,
       secret: this.generateSecret(),
-      account_status: AccountStatus.INACTIVE,
+      account_status: UserStatus.INACTIVE,
     });
   }
 
@@ -266,9 +266,9 @@ export class UsersService extends TypeOrmCrudService<User> {
       throw new BadRequestException(`User with id ${id} not found`);
     }
     const account_status =
-      user.account_status === AccountStatus.LOCKED
-        ? AccountStatus.INACTIVE
-        : AccountStatus.LOCKED;
+      user.account_status === UserStatus.LOCKED
+        ? UserStatus.INACTIVE
+        : UserStatus.LOCKED;
     await this.usersRepository.update(id, { account_status });
 
     return { ...user, account_status };

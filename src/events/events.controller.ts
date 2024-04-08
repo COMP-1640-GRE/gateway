@@ -5,7 +5,9 @@ import {
   JwtPayloadType,
 } from 'src/decorators/jwt-payload.decorator';
 import { EventsService } from './events.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Events')
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}

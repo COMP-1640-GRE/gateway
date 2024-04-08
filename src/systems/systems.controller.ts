@@ -5,9 +5,10 @@ import {
   NotFoundException,
   Patch,
   Post,
+  Request,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { RESOURCES } from 'src/dashboard/dashboard.controller';
+import { Request as ExpressRequest, Router } from 'express';
 import {
   JwtPayload,
   JwtPayloadType,
@@ -76,8 +77,11 @@ export class SystemsController {
   }
 
   @Get('available-guest-resources')
-  getAvailableGuestResources() {
-    return RESOURCES;
+  getAvailableGuestResources(@Request() req: ExpressRequest) {
+    const router = req.app._router as Router;
+    return router.stack
+      .map((layer) => layer.route?.path)
+      .filter((item) => item !== undefined && item.includes('/dashboard/'));
   }
 
   @Get('guest-resources')

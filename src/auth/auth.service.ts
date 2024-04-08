@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { CookieOptions, Response } from 'express';
 import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
-import { AccountStatus, User, UserRole } from 'src/users/entities/user.entity';
+import { UserStatus, User, UserRole } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { ActiveAccountDto, LoginDto } from './dto/auth.dto';
 import { REFRESH_TOKEN_KEY, TOKEN_KEY } from './jwt.strategy';
@@ -57,7 +57,7 @@ export class AuthService {
     };
 
     // if user is not active
-    if (account_status === AccountStatus.INACTIVE) {
+    if (account_status === UserStatus.INACTIVE) {
       res.status(HttpStatus.PRECONDITION_REQUIRED);
       res.statusMessage = 'You must activate your account';
 
@@ -65,7 +65,7 @@ export class AuthService {
     }
 
     // if user is locked
-    if (account_status === AccountStatus.LOCKED) {
+    if (account_status === UserStatus.LOCKED) {
       throw new ForbiddenException(
         'Your account is locked. Please contact administrator',
       );
@@ -126,7 +126,7 @@ export class AuthService {
     user.email = email;
     user.first_name = first_name;
     user.last_name = last_name;
-    user.account_status = AccountStatus.ACTIVE;
+    user.account_status = UserStatus.ACTIVE;
 
     await this.usersService.update(user);
 

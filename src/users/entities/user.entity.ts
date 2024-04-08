@@ -15,7 +15,7 @@ export enum UserRole {
   FACULTY_MARKETING_COORDINATOR = 'faculty_marketing_coordinator',
 }
 
-export enum AccountStatus {
+export enum UserStatus {
   LOCKED = 'locked',
   ACTIVE = 'active',
   INACTIVE = 'inactive',
@@ -63,10 +63,10 @@ export class User extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: AccountStatus,
-    default: AccountStatus.INACTIVE,
+    enum: UserStatus,
+    default: UserStatus.INACTIVE,
   })
-  account_status: AccountStatus;
+  account_status: UserStatus;
 
   @ManyToOne(() => Faculty, (faculty) => faculty.users, {
     eager: true,
