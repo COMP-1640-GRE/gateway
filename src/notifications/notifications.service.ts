@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 import { Queue } from 'bull';
 import { lastValueFrom } from 'rxjs';
-import { EventsService } from 'src/events/events.service';
+import { EventTypes, EventsService } from 'src/events/events.service';
 import { SystemsService } from 'src/systems/systems.service';
 import { Repository } from 'typeorm';
 import { Notification } from './entities/notification.entity';
@@ -67,7 +67,7 @@ export class NotificationsService extends TypeOrmCrudService<Notification> {
     return res;
   }
 
-  event(eventName = 'dashboard', data?: any) {
-    return this.eventsService.publish(eventName, data);
+  event(type: EventTypes = 'dashboard', data?: any) {
+    return this.eventsService.publish(type, data);
   }
 }

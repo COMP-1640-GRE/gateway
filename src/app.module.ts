@@ -12,6 +12,7 @@ import { RedisClientOptions } from 'redis';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { AuthModule } from './auth/auth.module';
+import { EventsGuard } from './auth/guards/events.guard';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { OwnerGuard } from './auth/guards/owner.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
@@ -91,6 +92,10 @@ import { UsersModule } from './users/users.module';
     {
       provide: APP_GUARD,
       useClass: OwnerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: EventsGuard,
     },
     {
       provide: APP_INTERCEPTOR,
