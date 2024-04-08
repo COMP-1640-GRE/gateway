@@ -40,6 +40,14 @@ export class DashboardController {
     return this.dashboardService.usersStats(dto);
   }
 
+  @Get('notifications-stats')
+  async notificationsStats(
+    @Query()
+    dto: DashboardDto,
+  ) {
+    return this.dashboardService.notificationsStats(dto);
+  }
+
   @Get('contributions-time-series')
   async contributionsTimeSeries(
     @Query()
@@ -70,5 +78,13 @@ export class DashboardController {
     dto: DashboardTimeSeriesDto,
   ) {
     return this.dashboardService.reviewsTimeSeries(dto);
+  }
+
+  @Get('notifications-time-series')
+  async notificationsTimeSeries(
+    @Query()
+    dto: DashboardTimeSeriesDto,
+  ) {
+    return this.dashboardService.notificationsTimeSeries(dto);
   }
 }

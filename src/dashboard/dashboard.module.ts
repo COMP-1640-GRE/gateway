@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Attachment } from 'src/attachments/entities/attachment.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
 import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { Faculty } from 'src/faculties/entities/faculty.entity';
@@ -21,7 +20,6 @@ import { DashboardService } from './dashboard.service';
       Comment,
       Reaction,
       Semester,
-      Attachment,
       Contribution,
       Notification,
     ]),

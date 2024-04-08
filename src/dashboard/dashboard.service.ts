@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Attachment } from 'src/attachments/entities/attachment.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
 import {
   Contribution,
@@ -25,8 +24,6 @@ export class DashboardService {
     private readonly contributionRepository: Repository<Contribution>,
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
-    @InjectRepository(Attachment)
-    private readonly attachmentRepository: Repository<Attachment>,
     @InjectRepository(Review)
     private readonly reviewRepository: Repository<Review>,
     @InjectRepository(Reaction)
@@ -146,6 +143,27 @@ export class DashboardService {
 
     if (to) {
       query.andWhere('u.created_at <= :to', { to });
+    }
+
+    return query.getRawOne();
+  }
+
+  async notificationsStats({ from, to }: DashboardDto) {
+    const query = this.notificationRepository
+      .createQueryBuilder('n')
+      .select('COUNT(n.id)', 'total_notifications')
+      .addSelect('COUNT(DISTINCT n.user_id)', 'total_users')
+      .addSelect(
+        'COUNT(CASE WHEN n.with_email = true THEN 1 ELSE NULL END)',
+        'with_email',
+      );
+
+    if (from) {
+      query.andWhere('n.created_at >= :from', { from });
+    }
+
+    if (to) {
+      query.andWhere('n.created_at <= :to', { to });
     }
 
     return query.getRawOne();
@@ -318,5 +336,27 @@ export class DashboardService {
     }
 
     return query.getRawMany();
+  }
+
+  async notificationsTimeSeries({ from, to, user_id }: DashboardTimeSeriesDto) {
+    const query = this.notificationRepository
+      .createQueryBuilder('n')
+      .select('DATE(n.created_at)', 'created_at')
+      .addSelect('COUNT(n.id)', 'total_notifications')
+      .addSelect('COUNT(DISTINCT n.user_id)', 'total_users')
+      .groupBy('DATE(n.created_at)')
+      .orderBy('DATE(n.created_at)');
+
+    if (from) {
+      query.andWhere('n.created_at >= :from', { from });
+    }
+
+    if (to) {
+      query.andWhere('n.created_at <= :to', { to });
+    }
+
+    if (user_id) {
+      query.andWhere('n.user_id = :user_id', { user_id });
+    }
   }
 }
