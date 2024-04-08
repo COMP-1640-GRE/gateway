@@ -14,8 +14,8 @@ import { ActiveAccountDto, LoginDto } from './dto/auth.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Public()
   @Post('login')
+  @Public()
   async login(
     @Res({ passthrough: true }) res: Response,
     @Body() dto: LoginDto,
@@ -23,8 +23,8 @@ export class AuthController {
     return this.authService.login(res, dto);
   }
 
-  @Public()
   @Patch('activate-account')
+  @Public()
   activate(
     @Res({ passthrough: true }) res: Response,
     @Body() dto: ActiveAccountDto,

@@ -12,7 +12,6 @@ import { RedisClientOptions } from 'redis';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { AuthModule } from './auth/auth.module';
-import { EventsGuard } from './auth/guards/events.guard';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { OwnerGuard } from './auth/guards/owner.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
@@ -21,6 +20,7 @@ import { ContributionsModule } from './contributions/contributions.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { EventsModule } from './events/events.module';
 import { FacultiesModule } from './faculties/faculties.module';
+import { EventsInterceptor } from './interceptors/events. interceptor';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ReactionsModule } from './reactions/reactions.module';
 import { ReviewsModule } from './reviews/reviews.module';
@@ -94,12 +94,12 @@ import { UsersModule } from './users/users.module';
       useClass: OwnerGuard,
     },
     {
-      provide: APP_GUARD,
-      useClass: EventsGuard,
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
     },
     {
       provide: APP_INTERCEPTOR,
-      useClass: ClassSerializerInterceptor,
+      useClass: EventsInterceptor,
     },
   ],
 })

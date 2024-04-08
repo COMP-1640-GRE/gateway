@@ -43,6 +43,7 @@ import {
   CONTRIBUTION_ENTITY,
   Contribution,
 } from './entities/contribution.entity';
+import { Events } from 'src/decorators/events.decorator';
 
 @ApiTags('Contributions')
 @Controller('contributions')
@@ -103,7 +104,9 @@ export class ContributionsController implements CrudController<Contribution> {
   get base(): CrudController<Contribution> {
     return this;
   }
+
   @Post()
+  @Events('dashboard')
   @Roles(UserRole.STUDENT)
   @ApiBody({ type: CreateContributionDto })
   @ApiConsumes('multipart/form-data')
@@ -136,6 +139,7 @@ export class ContributionsController implements CrudController<Contribution> {
   }
 
   @Patch('select-multiple')
+  @Events('dashboard')
   @Roles(UserRole.UNIVERSITY_MARKETING_MANAGER)
   selectMultiple(@Body() { ids }: SelectManyDto) {
     return this.service.selectMultiple(ids);
@@ -148,24 +152,28 @@ export class ContributionsController implements CrudController<Contribution> {
   }
 
   @Patch(':id/select')
+  @Events('dashboard')
   @Roles(UserRole.UNIVERSITY_MARKETING_MANAGER)
   select(@Param('id') id: string) {
     return this.service.select(+id);
   }
 
   @Patch(':id/evaluate')
+  @Events('dashboard')
   @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
   evaluate(@Param('id') id: string, @Body() dto: EvaluateDto) {
     return this.service.evaluate(+id, dto);
   }
 
   @Patch(':id/status')
+  @Events('dashboard')
   @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
   status(@Param('id') id: string, @Body() dto: StatusDto) {
     return this.service.status(+id, dto);
   }
 
   @Post(':id/reaction')
+  @Events('dashboard')
   reaction(
     @Param('id') id: string,
     @Body() { type }: CreateReactionDto,
@@ -223,6 +231,7 @@ export class ContributionsController implements CrudController<Contribution> {
   }
 
   @Delete(':id')
+  @Events('dashboard')
   @Roles(UserRole.STUDENT, UserRole.ADMINISTRATOR)
   @Owner(CONTRIBUTION_ENTITY, 'student_id', false, [UserRole.ADMINISTRATOR])
   remove(@Param('id') id: string) {

@@ -28,6 +28,7 @@ import {
 import { USER_ENTITY, User, UserRole } from './entities/user.entity';
 import { UsersService } from './users.service';
 import { Public } from 'src/decorators/public.decorator';
+import { Events } from 'src/decorators/events.decorator';
 
 @ApiTags('Users')
 @Controller('users')
@@ -73,6 +74,7 @@ export class UsersController implements CrudController<User> {
   constructor(public service: UsersService) {}
 
   @Post()
+  @Events('dashboard')
   @Roles(UserRole.ADMINISTRATOR)
   async createMultipleUsers(@Body() dto: CreateUsersDto) {
     return await this.service.createUsers(dto);
@@ -102,14 +104,14 @@ export class UsersController implements CrudController<User> {
     return this.service.changePassword(+id, dto);
   }
 
-  @Public()
   @Post('forgot-password')
+  @Public()
   forgotPassword(@Body() { email }: ForgotPasswordDto) {
     return this.service.forgotPassword(email);
   }
 
-  @Public()
   @Post('reset-password')
+  @Public()
   userResetPassword(@Body() { email, code, password }: ResetPasswordDto) {
     return this.service.userResetPassword(email, { code, password });
   }

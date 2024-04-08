@@ -11,6 +11,7 @@ import {
 } from 'src/decorators/jwt-payload.decorator';
 import { CreateReactionDto } from 'src/reactions/dto/create-reaction.dto';
 import { ReactionsService } from 'src/reactions/reactions.service';
+import { Events } from 'src/decorators/events.decorator';
 
 @ApiTags('Comments')
 @Controller('comments')
@@ -26,7 +27,7 @@ import { ReactionsService } from 'src/reactions/reactions.service';
   routes: {
     only: ['getOneBase', 'updateOneBase', 'deleteOneBase'],
     updateOneBase: {
-      decorators: [Owner(COMMENT_ENTITY, 'db_author_id')],
+      decorators: [Owner(COMMENT_ENTITY, 'db_author_id'), Events('dashboard')],
     },
     deleteOneBase: {
       decorators: [Owner(COMMENT_ENTITY, 'db_author_id')],
@@ -47,6 +48,7 @@ export class CommentsController implements CrudController<Comment> {
   ) {}
 
   @Post()
+  @Events('dashboard')
   create(
     @Body() dto: CreateCommentDto,
     @JwtPayload() { id, faculty }: JwtPayloadType,
@@ -55,6 +57,7 @@ export class CommentsController implements CrudController<Comment> {
   }
 
   @Post(':id/reaction')
+  @Events('dashboard')
   reaction(
     @Param('id') id: string,
     @Body() { type }: CreateReactionDto,

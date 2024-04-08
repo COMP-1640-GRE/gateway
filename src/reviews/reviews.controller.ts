@@ -11,6 +11,7 @@ import { UserRole } from 'src/users/entities/user.entity';
 import { CreateReviewDto } from './dto/review.dto';
 import { REVIEW_ENTITY, Review } from './entities/review.entity';
 import { ReviewsService } from './reviews.service';
+import { Events } from 'src/decorators/events.decorator';
 
 @ApiTags('Reviews')
 @Controller('reviews')
@@ -34,6 +35,7 @@ import { ReviewsService } from './reviews.service';
       decorators: [
         Roles(UserRole.FACULTY_MARKETING_COORDINATOR),
         Owner(REVIEW_ENTITY, 'reviewer_id'),
+        Events('dashboard'),
       ],
     },
   },
@@ -49,6 +51,7 @@ export class ReviewsController implements CrudController<Review> {
   constructor(public service: ReviewsService) {}
 
   @Post()
+  @Events('dashboard')
   @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
   create(
     @Body() updateReviewDto: CreateReviewDto,

@@ -6,6 +6,7 @@ import { UserRole } from 'src/users/entities/user.entity';
 import { CreateSemesterDto } from './dto/semester.dto';
 import { Semester } from './entities/semester.entity';
 import { SemestersService } from './semesters.service';
+import { Events } from 'src/decorators/events.decorator';
 
 @ApiTags('Semesters')
 @Controller('semesters')
@@ -46,6 +47,7 @@ export class SemestersController implements CrudController<Semester> {
   constructor(public service: SemestersService) {}
 
   @Post()
+  @Events('dashboard')
   @Roles(UserRole.ADMINISTRATOR)
   create(@Body() dto: CreateSemesterDto) {
     return this.service.create(dto);
