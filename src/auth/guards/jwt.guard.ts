@@ -9,7 +9,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtPayloadType } from 'src/decorators/jwt-payload.decorator';
 import { IS_PUBLIC_KEY } from 'src/decorators/public.decorator';
 import { UsersService } from 'src/users/users.service';
-import { JwtStrategy, REFRESH_TOKEN_KEY } from './jwt.strategy';
+import { JwtStrategy, REFRESH_TOKEN_KEY } from '../jwt.strategy';
 
 @Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
