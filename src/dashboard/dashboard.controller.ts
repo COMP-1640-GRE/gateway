@@ -63,7 +63,7 @@ export class DashboardController {
     return this.dashboardService.notificationsStats(dto);
   }
 
-  @Get('contributions-time-series')
+  @Get('contribution-time-series')
   async contributionsTimeSeries(
     @Query()
     dto: DashboardTimeSeriesDto,
@@ -71,7 +71,7 @@ export class DashboardController {
     return this.dashboardService.contributionsTimeSeries(dto);
   }
 
-  @Get('reactions-time-series')
+  @Get('reaction-time-series')
   async reactionsTimeSeries(
     @Query()
     dto: DashboardTimeSeriesDto,
@@ -79,7 +79,7 @@ export class DashboardController {
     return this.dashboardService.reactionsTimeSeries(dto);
   }
 
-  @Get('comments-time-series')
+  @Get('comment-time-series')
   async commentsTimeSeries(
     @Query()
     dto: DashboardTimeSeriesDto,
@@ -87,7 +87,7 @@ export class DashboardController {
     return this.dashboardService.commentsTimeSeries(dto);
   }
 
-  @Get('reviews-time-series')
+  @Get('review-time-series')
   async reviewsTimeSeries(
     @Query()
     dto: DashboardTimeSeriesDto,
@@ -95,7 +95,7 @@ export class DashboardController {
     return this.dashboardService.reviewsTimeSeries(dto);
   }
 
-  @Get('notifications-time-series')
+  @Get('notification-time-series')
   async notificationsTimeSeries(
     @Query()
     dto: DashboardTimeSeriesDto,
