@@ -86,7 +86,10 @@ export class DashboardService {
       .createQueryBuilder('c')
       .select('COUNT(c.id)', 'total_contributions')
       .addSelect('COUNT(DISTINCT c.db_author_id)', 'total_contributors')
-      .addSelect('COUNT(c.is_anonymous)', 'total_anonymous_contributions')
+      .addSelect(
+        'COUNT(CASE WHEN c.is_anonymous = true THEN 1 ELSE NULL END)',
+        'total_anonymous_contributions',
+      )
       .addSelect('SUM(c.view_count)', 'total_views')
       .addSelect(
         'COUNT(CASE WHEN c.selected THEN 1 ELSE NULL END)',
@@ -152,7 +155,6 @@ export class DashboardService {
     const query = this.notificationRepository
       .createQueryBuilder('n')
       .select('COUNT(n.id)', 'total_notifications')
-      .addSelect('COUNT(DISTINCT n.user_id)', 'total_users')
       .addSelect(
         'COUNT(CASE WHEN n.with_email = true THEN 1 ELSE NULL END)',
         'with_email',

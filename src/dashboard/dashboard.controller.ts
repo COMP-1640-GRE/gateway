@@ -2,6 +2,8 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { DashboardService } from './dashboard.service';
 import { DashboardDto, DashboardTimeSeriesDto } from './dto/dashboard.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { UserRole } from 'src/users/entities/user.entity';
 
 @ApiTags('Dashboard')
 @Controller('dashboard')
@@ -9,6 +11,11 @@ export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
   @Get('faculty-stats')
+  @Roles(
+    UserRole.ADMINISTRATOR,
+    UserRole.UNIVERSITY_MARKETING_MANAGER,
+    UserRole.FACULTY_MARKETING_COORDINATOR,
+  )
   async facultyStats(
     @Query()
     dto: DashboardDto,
@@ -17,6 +24,11 @@ export class DashboardController {
   }
 
   @Get('semester-stats')
+  @Roles(
+    UserRole.ADMINISTRATOR,
+    UserRole.UNIVERSITY_MARKETING_MANAGER,
+    UserRole.FACULTY_MARKETING_COORDINATOR,
+  )
   async semesterStats(
     @Query()
     dto: DashboardDto,
@@ -25,6 +37,7 @@ export class DashboardController {
   }
 
   @Get('contribution-stats')
+  @Roles(UserRole.ADMINISTRATOR, UserRole.UNIVERSITY_MARKETING_MANAGER)
   async contributionStats(
     @Query()
     dto: DashboardDto,
@@ -33,6 +46,7 @@ export class DashboardController {
   }
 
   @Get('users-stats')
+  @Roles(UserRole.ADMINISTRATOR, UserRole.UNIVERSITY_MARKETING_MANAGER)
   async usersStats(
     @Query()
     dto: DashboardDto,
@@ -41,6 +55,7 @@ export class DashboardController {
   }
 
   @Get('notifications-stats')
+  @Roles(UserRole.ADMINISTRATOR, UserRole.UNIVERSITY_MARKETING_MANAGER)
   async notificationsStats(
     @Query()
     dto: DashboardDto,
