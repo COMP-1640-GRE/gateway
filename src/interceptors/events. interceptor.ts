@@ -33,7 +33,7 @@ export class EventsInterceptor implements NestInterceptor {
       .handle()
       .pipe(
         tap(() =>
-          events.forEach((event) => this.notificationsService.event(event)),
+          events.forEach((event) => this.notificationsService.event(event, {})),
         ),
       );
   }
