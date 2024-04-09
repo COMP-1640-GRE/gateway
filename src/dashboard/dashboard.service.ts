@@ -247,8 +247,8 @@ export class DashboardService {
 
     if (semester_id) {
       query
-        .leftJoin('r.contribution', 'c')
-        .andWhere('c.semester_id = :semester_id', { semester_id });
+        .leftJoin('r.contribution', 'con')
+        .andWhere('con.semester_id = :semester_id', { semester_id });
     }
 
     return query.getRawMany();
@@ -290,8 +290,8 @@ export class DashboardService {
 
     if (semester_id) {
       query
-        .leftJoin('c.contribution', 'con')
-        .andWhere('con.semester_id = :semester_id', { semester_id });
+        .leftJoin('c.contribution', 'cont')
+        .andWhere('cont.semester_id = :semester_id', { semester_id });
     }
 
     return query.getRawMany();
@@ -333,8 +333,8 @@ export class DashboardService {
 
     if (semester_id) {
       query
-        .leftJoin('r.contribution', 'con')
-        .andWhere('con.semester_id = :semester_id', { semester_id });
+        .leftJoin('r.contribution', 'cont')
+        .andWhere('cont.semester_id = :semester_id', { semester_id });
     }
 
     return query.getRawMany();
@@ -360,5 +360,7 @@ export class DashboardService {
     if (user_id) {
       query.andWhere('n.user_id = :user_id', { user_id });
     }
+
+    return query.getRawMany();
   }
 }
