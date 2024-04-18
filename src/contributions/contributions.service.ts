@@ -128,7 +128,9 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
   ) {
     let toDelete: string[] = [];
     try {
-      toDelete = JSON.parse(to_delete);
+      if (to_delete) {
+        toDelete = JSON.parse(to_delete);
+      }
     } catch {
       throw new BadRequestException('Invalid to_delete');
     }
@@ -156,7 +158,7 @@ export class ContributionsService extends TypeOrmCrudService<Contribution> {
 
   async remove(id: number) {
     const contribution = await this.contributionsRepository.findOne(id, {
-      relations: ['student', 'attachments'],
+      relations: ['db_author', 'attachments'],
     });
 
     if (!contribution) {

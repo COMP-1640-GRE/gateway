@@ -211,7 +211,7 @@ export class ContributionsController implements CrudController<Contribution> {
 
   @Patch(':id')
   @Roles(UserRole.STUDENT)
-  @Owner(CONTRIBUTION_ENTITY, 'student_id')
+  @Owner(CONTRIBUTION_ENTITY, 'db_author')
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateContributionDto })
   @UseInterceptors(FilesInterceptor('attachments'))
@@ -233,7 +233,7 @@ export class ContributionsController implements CrudController<Contribution> {
   @Delete(':id')
   @Events('dashboard')
   @Roles(UserRole.STUDENT, UserRole.ADMINISTRATOR)
-  @Owner(CONTRIBUTION_ENTITY, 'student_id', false, [UserRole.ADMINISTRATOR])
+  @Owner(CONTRIBUTION_ENTITY, 'db_author', false, [UserRole.ADMINISTRATOR])
   remove(@Param('id') id: string) {
     return this.service.remove(+id);
   }
