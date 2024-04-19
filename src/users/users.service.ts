@@ -4,6 +4,7 @@ import {
   Inject,
   Injectable,
   Logger,
+  OnModuleInit,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
@@ -26,7 +27,10 @@ import {
 import { UserStatus, User, UserRole } from './entities/user.entity';
 
 @Injectable()
-export class UsersService extends TypeOrmCrudService<User> {
+export class UsersService
+  extends TypeOrmCrudService<User>
+  implements OnModuleInit
+{
   constructor(
     @InjectRepository(User)
     public usersRepository: Repository<User>,
@@ -38,22 +42,22 @@ export class UsersService extends TypeOrmCrudService<User> {
     private cacheManager: Cache,
   ) {
     super(usersRepository);
-    // check if users table is empty
-    this.usersRepository.count().then((count) => {
-      // if table is empty, create administrator user
-      if (count === 0) {
-        const usernames = 'admin';
+  }
 
-        this.createUsers({
-          usernames,
-          role: UserRole.ADMINISTRATOR,
-        }).then(() => {
-          Logger.log(
-            `'Administrator user created with username: ${usernames} and password: ${this.systemsService.config.user.default_password}`,
-          );
-        });
-      }
+  async onModuleInit() {
+    const adminUser = await this.usersRepository.findOne({
+      where: { role: UserRole.ADMINISTRATOR },
     });
+
+    // if these are no admin users, create administrator user
+    if (!adminUser) {
+      const usernames = 'admin';
+      await this.createUsers({ usernames, role: UserRole.ADMINISTRATOR });
+
+      Logger.log(
+        `'Administrator user created with username: ${usernames} and password: ${this.systemsService.config.user.default_password}`,
+      );
+    }
   }
 
   async createUsers({

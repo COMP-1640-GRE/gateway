@@ -54,9 +54,9 @@ export class ReviewsController implements CrudController<Review> {
   @Events('dashboard')
   @Roles(UserRole.FACULTY_MARKETING_COORDINATOR)
   create(
-    @Body() updateReviewDto: CreateReviewDto,
+    @Body() dto: CreateReviewDto,
     @JwtPayload() { id: userId }: JwtPayloadType,
   ) {
-    return this.service.create(userId, updateReviewDto);
+    return this.service.create(userId, dto);
   }
 }
