@@ -44,6 +44,7 @@ export class NotificationsController implements CrudController<Notification> {
     @JwtPayload() { id }: JwtPayloadType,
   ) {
     req.parsed.search.$and = [{ $and: [{ user_id: { $eq: id } }] }];
+    req.parsed.sort = [{ field: 'created_at', order: 'DESC' }];
 
     return this.service.getMany(req);
   }
